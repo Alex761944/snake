@@ -1,0 +1,31 @@
+:root {
+  --cell-size: 16px;
+  --column-count: 20;
+  --row-count: 15;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+canvas {
+  background-color: black;
+  width: calc(var(--column-count) * var(--cell-size));
+  height: calc(var(--row-count) * var(--cell-size));
+}
