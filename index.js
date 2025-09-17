@@ -183,19 +183,13 @@ class Snake {
         entity.consumed = true;
       }
     });
-    if (head.column >= COLUMN_COUNT) {
-      game.stop();
-    }
 
-    if (head.column < 0) {
-      game.stop();
-    }
-
-    if (head.row >= ROW_COUNT) {
-      game.stop();
-    }
-
-    if (head.row < 0) {
+    if (
+      head.column < 0 ||
+      head.column >= COLUMN_COUNT ||
+      head.row < 0 ||
+      head.row >= ROW_COUNT
+    ) {
       game.stop();
     }
   }
