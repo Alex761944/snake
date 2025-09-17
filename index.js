@@ -176,15 +176,26 @@ class Snake {
   }
 
   checkCollisions(entities) {
+    const head = this.body[0];
+
     entities.forEach((entity) => {
-      if (
-        entity.column === this.body[0].column &&
-        entity.row === this.body[0].row
-      ) {
+      if (entity.column === head.column && entity.row === head.row) {
         entity.consumed = true;
       }
     });
-    if (this.body[0].column >= COLUMN_COUNT) {
+    if (head.column >= COLUMN_COUNT) {
+      game.stop();
+    }
+
+    if (head.column < 0) {
+      game.stop();
+    }
+
+    if (head.row >= ROW_COUNT) {
+      game.stop();
+    }
+
+    if (head.row < 0) {
       game.stop();
     }
   }
