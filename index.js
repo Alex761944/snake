@@ -14,23 +14,6 @@ class Game {
     this.ctx = this.canvas.getContext("2d");
     this.entities = [];
 
-    window.addEventListener("keydown", (event) => {
-      switch (event.key) {
-        case "ArrowUp":
-          console.log("hoch");
-          break;
-        case "ArrowDown":
-          console.log("runter");
-          break;
-        case "ArrowLeft":
-          console.log("links");
-          break;
-        case "ArrowRight":
-          console.log("rechts");
-          break;
-      }
-    });
-
     document.querySelector("#start").addEventListener("click", () => {
       this.start();
     });
@@ -92,10 +75,17 @@ class Game {
         entity.move();
       }
 
-      if (entity.checkCollisions) {
-        entity.checkCollisions(
+      if (entity.foodCollisions) {
+        entity.foodCollisions(
           this.entities.filter((entity) => entity.name !== "snake")
         );
+      }
+
+      const snake = this.entities.find((entity) => entity.name === "snake");
+
+      if (entity.name === "snake" && snake.leftArena()) {
+        this.stop();
+        return;
       }
     });
 
@@ -175,7 +165,18 @@ class Snake {
     this.body.pop();
   }
 
-  checkCollisions(entities) {
+  leftArena() {
+    const head = this.body[0];
+
+    return (
+      head.column < 0 ||
+      head.column >= COLUMN_COUNT ||
+      head.row < 0 ||
+      head.row >= ROW_COUNT
+    );
+  }
+
+  foodCollisions(entities) {
     const head = this.body[0];
 
     entities.forEach((entity) => {
@@ -183,15 +184,6 @@ class Snake {
         entity.consumed = true;
       }
     });
-
-    if (
-      head.column < 0 ||
-      head.column >= COLUMN_COUNT ||
-      head.row < 0 ||
-      head.row >= ROW_COUNT
-    ) {
-      game.stop();
-    }
   }
 
   draw() {
