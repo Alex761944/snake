@@ -122,7 +122,7 @@ class Game {
   }
 
   getEmptyCells() {
-    const emptyCells = [...this.cells];
+    let emptyCells = [...this.cells];
 
     emptyCells = emptyCells.filter((cell) => {
       return !this.snake.body.some(
@@ -147,7 +147,7 @@ class Food {
     this.name = "food";
   }
 
-  move() {
+  moveFood() {
     console.log("Move food");
   }
 
@@ -228,7 +228,7 @@ class Snake {
 
     if (food.column === head.column && food.row === head.row) {
       this.grow = true;
-      food.move();
+      food.moveFood();
     }
   }
 
