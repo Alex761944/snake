@@ -9,9 +9,20 @@ class Game {
     this.rowCount = ROW_COUNT;
     this.interval = null;
     this.running = false;
+
+    this.snake = null;
+    this.food = null;
+
     this.canvas = document.querySelector("#canvas");
     this.ctx = this.canvas.getContext("2d");
     this.entities = [];
+    this.cells = [];
+
+    for (let column = 0; column < COLUMN_COUNT; column++) {
+      for (let row = 0; row < ROW_COUNT; row++) {
+        this.cells.push({ column, row });
+      }
+    }
 
     document.querySelector("#start").addEventListener("click", () => {
       this.start();
@@ -19,6 +30,39 @@ class Game {
 
     document.querySelector("#stop").addEventListener("click", () => {
       this.stop();
+    });
+
+    window.addEventListener("keydown", ({ key }) => {
+      if (!this.entities) return;
+
+      const snake = this.entities.find((entity) => entity.name === "snake");
+      if (!snake) return;
+
+      if (
+        key === "ArrowUp" &&
+        snake.direction !== "up" &&
+        snake.direction !== "down"
+      ) {
+        snake.setDirection("up");
+      } else if (
+        key === "ArrowDown" &&
+        snake.direction !== "up" &&
+        snake.direction !== "down"
+      ) {
+        snake.setDirection("down");
+      } else if (
+        key === "ArrowLeft" &&
+        snake.direction !== "left" &&
+        snake.direction !== "right"
+      ) {
+        snake.setDirection("left");
+      } else if (
+        key === "ArrowRight" &&
+        snake.direction !== "left" &&
+        snake.direction !== "right"
+      ) {
+        snake.setDirection("right");
+      }
     });
   }
 
@@ -30,9 +74,13 @@ class Game {
 
     this.running = true;
 
-    const snake = new Snake(this.ctx);
+    this.snake = new Snake(this.ctx);
 
-    this.entities.push(snake);
+    this.food = new Food(this.ctx);
+
+    this.entities.push(this.snake);
+
+    this.entities.push(this.food);
 
     this.interval = setInterval(this.update.bind(this), 1000);
   }
@@ -46,17 +94,75 @@ class Game {
   update() {
     console.log("update");
 
+    this.entities.forEach((entity) => {
+      if (entity.move) {
+        const availableCells = this.getEmptyCells();
+        entity.move(availableCells);
+      }
+
+      if (entity.foodCollisions) {
+        entity.foodCollisions(this.food);
+      }
+    });
+
+    const snake = this.entities.find((entity) => entity.name === "snake");
+
+    if (snake.leftArena()) {
+      this.stop();
+      return;
+    }
+
     this.ctx.clearRect(0, 0, COLUMN_COUNT * CELL_SIZE, ROW_COUNT * CELL_SIZE);
 
     this.entities.forEach((entity) => {
-      if (entity.move) {
-        entity.move();
-      }
-
       if (entity.draw) {
         entity.draw();
       }
     });
+  }
+
+  getEmptyCells() {
+    const emptyCells = [...this.cells];
+
+    emptyCells = emptyCells.filter((cell) => {
+      return !this.snake.body.some(
+        (segment) => segment.column === cell.column && segment.row === cell.row
+      );
+    });
+
+    emptyCells = emptyCells.filter((cell) => {
+      return !(this.food.column === cell.column && this.food.row === cell.row);
+    });
+
+    return emptyCells;
+  }
+}
+class Food {
+  constructor(ctx) {
+    this.ctx = ctx;
+    this.margin = 1;
+    this.foodSize = CELL_SIZE - this.margin * 2;
+    this.column = 10;
+    this.row = 5;
+    this.name = "food";
+  }
+
+  move() {
+    console.log("Move food");
+  }
+
+  draw() {
+    this.ctx.fillStyle = "red";
+
+    this.ctx.beginPath();
+    this.ctx.arc(
+      this.column * CELL_SIZE + CELL_SIZE / 2,
+      this.row * CELL_SIZE + CELL_SIZE / 2,
+      CELL_SIZE / 2 - this.margin,
+      0,
+      2 * Math.PI
+    );
+    this.ctx.fill();
   }
 }
 
@@ -66,6 +172,7 @@ class Snake {
     this.margin = 1;
     this.segmentSize = CELL_SIZE - this.margin * 2;
     this.direction = "right";
+    this.name = "snake";
     this.body = [
       {
         column: 5,
@@ -78,16 +185,50 @@ class Snake {
     ];
   }
 
+  setDirection(newDirection) {
+    this.direction = newDirection;
+  }
+
   move() {
+    const head = this.body[0];
+    const newHead = { column: head.column, row: head.row };
+
     if (this.direction === "right") {
-      const newSegment = {
-        column: this.body[0].column + 1,
-        row: this.body[0].row,
-      };
+      newHead.column += 1;
+    } else if (this.direction === "up") {
+      newHead.row -= 1;
+    } else if (this.direction === "down") {
+      newHead.row += 1;
+    } else if (this.direction === "left") {
+      newHead.column -= 1;
+    }
 
-      this.body.unshift(newSegment);
+    this.body.unshift(newHead);
 
+    if (this.grow) {
+      this.grow = false;
+    } else {
       this.body.pop();
+    }
+  }
+
+  leftArena() {
+    const head = this.body[0];
+
+    return (
+      head.column < 0 ||
+      head.column >= COLUMN_COUNT ||
+      head.row < 0 ||
+      head.row >= ROW_COUNT
+    );
+  }
+
+  foodCollisions(food) {
+    const head = this.body[0];
+
+    if (food.column === head.column && food.row === head.row) {
+      this.grow = true;
+      food.move();
     }
   }
 
