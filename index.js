@@ -105,9 +105,9 @@ class Game {
       }
     });
 
-    const snake = this.entities.find((entity) => entity.name === "snake");
+    const snake = this.snake;
 
-    if (snake.leftArena()) {
+    if (snake.leftArena() || snake.selfCollision()) {
       this.stop();
       return;
     }
@@ -225,6 +225,13 @@ class Snake {
       head.column >= COLUMN_COUNT ||
       head.row < 0 ||
       head.row >= ROW_COUNT
+    );
+  }
+
+  selfCollision() {
+    const [head, ...body] = this.body;
+    return body.some(
+      (bodyCell) => bodyCell.column === head.column && bodyCell.row === head.row
     );
   }
 
