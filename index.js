@@ -147,8 +147,13 @@ class Food {
     this.name = "food";
   }
 
-  moveFood() {
-    console.log("Move food");
+  moveFood(emptyCells) {
+    if (!emptyCells) return;
+    const randomCells = Math.floor(Math.random() * emptyCells.length);
+    const newCell = emptyCells[randomCells];
+
+    this.column = newCell.column;
+    this.row = newCell.row;
   }
 
   draw() {
@@ -228,7 +233,9 @@ class Snake {
 
     if (food.column === head.column && food.row === head.row) {
       this.grow = true;
-      food.moveFood();
+
+      const emptyCells = game.getEmptyCells();
+      food.moveFood(emptyCells);
     }
   }
 
