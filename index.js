@@ -8,11 +8,21 @@ class Game {
     this.columnCount = COLUMN_COUNT;
     this.rowCount = ROW_COUNT;
     this.interval = null;
-    this.food = null;
     this.running = false;
+
+    this.snake = null;
+    this.food = null;
+
     this.canvas = document.querySelector("#canvas");
     this.ctx = this.canvas.getContext("2d");
     this.entities = [];
+    this.cells = [];
+
+    for (let column = 0; column < COLUMN_COUNT; column++) {
+      for (let row = 0; row < ROW_COUNT; row++) {
+        this.cells.push({ column, row });
+      }
+    }
 
     document.querySelector("#start").addEventListener("click", () => {
       this.start();
@@ -22,19 +32,35 @@ class Game {
       this.stop();
     });
 
-    window.addEventListener("keydown", (e) => {
+    window.addEventListener("keydown", ({ key }) => {
       if (!this.entities) return;
 
       const snake = this.entities.find((entity) => entity.name === "snake");
       if (!snake) return;
 
-      if (e.key === "ArrowUp") {
+      if (
+        key === "ArrowUp" &&
+        snake.direction !== "up" &&
+        snake.direction !== "down"
+      ) {
         snake.setDirection("up");
-      } else if (e.key === "ArrowDown") {
+      } else if (
+        key === "ArrowDown" &&
+        snake.direction !== "up" &&
+        snake.direction !== "down"
+      ) {
         snake.setDirection("down");
-      } else if (e.key === "ArrowLeft") {
+      } else if (
+        key === "ArrowLeft" &&
+        snake.direction !== "left" &&
+        snake.direction !== "right"
+      ) {
         snake.setDirection("left");
-      } else if (e.key === "ArrowRight") {
+      } else if (
+        key === "ArrowRight" &&
+        snake.direction !== "left" &&
+        snake.direction !== "right"
+      ) {
         snake.setDirection("right");
       }
     });
@@ -48,13 +74,13 @@ class Game {
 
     this.running = true;
 
-    const snake = new Snake(this.ctx);
+    this.snake = new Snake(this.ctx);
 
-    const food = new Food(this.ctx);
+    this.food = new Food(this.ctx);
 
-    this.entities.push(snake);
+    this.entities.push(this.snake);
 
-    this.entities.push(food);
+    this.entities.push(this.food);
 
     this.interval = setInterval(this.update.bind(this), 1000);
   }
@@ -68,34 +94,47 @@ class Game {
   update() {
     console.log("update");
 
-    this.ctx.clearRect(0, 0, COLUMN_COUNT * CELL_SIZE, ROW_COUNT * CELL_SIZE);
-
     this.entities.forEach((entity) => {
       if (entity.move) {
-        entity.move();
+        const availableCells = this.getEmptyCells();
+        entity.move(availableCells);
       }
 
       if (entity.foodCollisions) {
-        entity.foodCollisions(
-          this.entities.filter((entity) => entity.name !== "snake")
-        );
-      }
-
-      const snake = this.entities.find((entity) => entity.name === "snake");
-
-      if (entity.name === "snake" && snake.leftArena()) {
-        this.stop();
-        return;
+        entity.foodCollisions(this.food);
       }
     });
 
-    this.entities = this.entities.filter((entity) => entity.consumed !== true);
+    const snake = this.entities.find((entity) => entity.name === "snake");
+
+    if (snake.leftArena()) {
+      this.stop();
+      return;
+    }
+
+    this.ctx.clearRect(0, 0, COLUMN_COUNT * CELL_SIZE, ROW_COUNT * CELL_SIZE);
 
     this.entities.forEach((entity) => {
       if (entity.draw) {
         entity.draw();
       }
     });
+  }
+
+  getEmptyCells() {
+    const emptyCells = [...this.cells];
+
+    emptyCells = emptyCells.filter((cell) => {
+      return !this.snake.body.some(
+        (segment) => segment.column === cell.column && segment.row === cell.row
+      );
+    });
+
+    emptyCells = emptyCells.filter((cell) => {
+      return !(this.food.column === cell.column && this.food.row === cell.row);
+    });
+
+    return emptyCells;
   }
 }
 class Food {
@@ -106,7 +145,10 @@ class Food {
     this.column = 10;
     this.row = 5;
     this.name = "food";
-    this.consumed = false;
+  }
+
+  move() {
+    console.log("Move food");
   }
 
   draw() {
@@ -162,7 +204,12 @@ class Snake {
     }
 
     this.body.unshift(newHead);
-    this.body.pop();
+
+    if (this.grow) {
+      this.grow = false;
+    } else {
+      this.body.pop();
+    }
   }
 
   leftArena() {
@@ -176,14 +223,13 @@ class Snake {
     );
   }
 
-  foodCollisions(entities) {
+  foodCollisions(food) {
     const head = this.body[0];
 
-    entities.forEach((entity) => {
-      if (entity.column === head.column && entity.row === head.row) {
-        entity.consumed = true;
-      }
-    });
+    if (food.column === head.column && food.row === head.row) {
+      this.grow = true;
+      food.move();
+    }
   }
 
   draw() {
