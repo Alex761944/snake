@@ -100,14 +100,12 @@ class Game {
         entity.move(availableCells);
       }
 
-      if (entity.foodCollisions) {
-        entity.foodCollisions(this.food);
+      if (entity.foodCollision) {
+        entity.foodCollision(this.food);
       }
     });
 
-    const snake = this.snake;
-
-    if (snake.leftArena() || snake.selfCollision()) {
+    if (this.snake.leftArena() || this.snake.selfCollision()) {
       this.stop();
       return;
     }
@@ -147,10 +145,10 @@ class Food {
     this.name = "food";
   }
 
-  moveFood(emptyCells) {
-    if (!emptyCells) return;
-    const randomCells = Math.floor(Math.random() * emptyCells.length);
-    const newCell = emptyCells[randomCells];
+  move(emptyCells) {
+    if (!emptyCells);
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+    const newCell = emptyCells[randomIndex];
 
     this.column = newCell.column;
     this.row = newCell.row;
@@ -235,14 +233,14 @@ class Snake {
     );
   }
 
-  foodCollisions(food) {
+  foodCollision(food) {
     const head = this.body[0];
 
     if (food.column === head.column && food.row === head.row) {
       this.grow = true;
 
       const emptyCells = game.getEmptyCells();
-      food.moveFood(emptyCells);
+      food.move(emptyCells);
     }
   }
 
