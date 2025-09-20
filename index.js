@@ -94,16 +94,13 @@ class Game {
   update() {
     console.log("update");
 
-    this.entities.forEach((entity) => {
-      if (entity.move) {
-        const availableCells = this.getEmptyCells();
-        entity.move(availableCells);
-      }
+    this.snake.move();
 
-      if (entity.foodCollision) {
-        entity.foodCollision(this.food);
-      }
-    });
+    const foodCollision = this.snake.foodCollision(this.food);
+
+    if (foodCollision) {
+      this.food.move(this.getEmptyCells());
+    }
 
     if (this.snake.leftArena() || this.snake.selfCollision()) {
       this.stop();
@@ -146,7 +143,6 @@ class Food {
   }
 
   move(emptyCells) {
-    if (!emptyCells);
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const newCell = emptyCells[randomIndex];
 
@@ -239,9 +235,10 @@ class Snake {
     if (food.column === head.column && food.row === head.row) {
       this.grow = true;
 
-      const emptyCells = game.getEmptyCells();
-      food.move(emptyCells);
+      return true;
     }
+
+    return false;
   }
 
   draw() {
