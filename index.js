@@ -43,25 +43,25 @@ class Game {
         snake.direction !== "up" &&
         snake.direction !== "down"
       ) {
-        snake.setDirection("up");
+        snake.desiredDirection = "up";
       } else if (
         key === "ArrowDown" &&
         snake.direction !== "up" &&
         snake.direction !== "down"
       ) {
-        snake.setDirection("down");
+        snake.desiredDirection = "down";
       } else if (
         key === "ArrowLeft" &&
         snake.direction !== "left" &&
         snake.direction !== "right"
       ) {
-        snake.setDirection("left");
+        snake.desiredDirection = "left";
       } else if (
         key === "ArrowRight" &&
         snake.direction !== "left" &&
         snake.direction !== "right"
       ) {
-        snake.setDirection("right");
+        snake.desiredDirection = "right";
       }
     });
   }
@@ -170,6 +170,7 @@ class Snake {
     this.ctx = ctx;
     this.margin = 1;
     this.segmentSize = CELL_SIZE - this.margin * 2;
+    this.desiredDirection = null;
     this.direction = "right";
     this.name = "snake";
     this.body = [
@@ -192,6 +193,34 @@ class Snake {
     const head = this.body[0];
     const newHead = { column: head.column, row: head.row };
 
+    /* Check legality of move */
+    if (
+      this.desiredDirection === "up" &&
+      this.direction !== "up" &&
+      this.direction !== "down"
+    ) {
+      this.direction = "up";
+    } else if (
+      this.desiredDirection === "down" &&
+      this.direction !== "up" &&
+      this.direction !== "down"
+    ) {
+      this.direction = "down";
+    } else if (
+      this.desiredDirection === "left" &&
+      this.direction !== "left" &&
+      this.direction !== "right"
+    ) {
+      this.direction = "left";
+    } else if (
+      this.desiredDirection === "right" &&
+      this.direction !== "left" &&
+      this.direction !== "right"
+    ) {
+      this.direction = "right";
+    }
+
+    /* Move in direction */
     if (this.direction === "right") {
       newHead.column += 1;
     } else if (this.direction === "up") {
