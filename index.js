@@ -94,20 +94,15 @@ class Game {
   update() {
     console.log("update");
 
-    this.entities.forEach((entity) => {
-      if (entity.move) {
-        const availableCells = this.getEmptyCells();
-        entity.move(availableCells);
-      }
+    this.snake.move();
 
-      if (entity.foodCollisions) {
-        entity.foodCollisions(this.food);
-      }
-    });
+    const foodCollision = this.snake.foodCollision(this.food);
 
-    const snake = this.entities.find((entity) => entity.name === "snake");
+    if (foodCollision) {
+      this.food.move(this.getEmptyCells());
+    }
 
-    if (snake.leftArena()) {
+    if (this.snake.leftArena() || this.snake.selfCollision()) {
       this.stop();
       return;
     }
@@ -147,8 +142,12 @@ class Food {
     this.name = "food";
   }
 
-  moveFood() {
-    console.log("Move food");
+  move(emptyCells) {
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+    const newCell = emptyCells[randomIndex];
+
+    this.column = newCell.column;
+    this.row = newCell.row;
   }
 
   draw() {
@@ -223,13 +222,23 @@ class Snake {
     );
   }
 
-  foodCollisions(food) {
+  selfCollision() {
+    const [head, ...body] = this.body;
+    return body.some(
+      (bodyCell) => bodyCell.column === head.column && bodyCell.row === head.row
+    );
+  }
+
+  foodCollision(food) {
     const head = this.body[0];
 
     if (food.column === head.column && food.row === head.row) {
       this.grow = true;
-      food.moveFood();
+
+      return true;
     }
+
+    return false;
   }
 
   draw() {
