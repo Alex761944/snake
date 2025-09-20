@@ -13,6 +13,8 @@ class Game {
     this.snake = null;
     this.food = null;
 
+    this.tick = 0;
+
     this.canvas = document.querySelector("#canvas");
     this.ctx = this.canvas.getContext("2d");
     this.entities = [];
@@ -82,7 +84,8 @@ class Game {
 
     this.entities.push(this.food);
 
-    this.interval = setInterval(this.update.bind(this), 1000);
+    /* Run game loop 60 times per second */
+    this.interval = setInterval(this.update.bind(this), 1000 / 60);
   }
 
   stop() {
@@ -94,26 +97,31 @@ class Game {
   update() {
     console.log("update");
 
-    this.snake.move();
+    /* Things that should only happen every 60 frames */
+    if (this.tick % 60 === 0) {
+      this.snake.move();
 
-    const foodCollision = this.snake.foodCollision(this.food);
+      const foodCollision = this.snake.foodCollision(this.food);
 
-    if (foodCollision) {
-      this.food.move(this.getEmptyCells());
-    }
-
-    if (this.snake.leftArena() || this.snake.selfCollision()) {
-      this.stop();
-      return;
-    }
-
-    this.ctx.clearRect(0, 0, COLUMN_COUNT * CELL_SIZE, ROW_COUNT * CELL_SIZE);
-
-    this.entities.forEach((entity) => {
-      if (entity.draw) {
-        entity.draw();
+      if (foodCollision) {
+        this.food.move(this.getEmptyCells());
       }
-    });
+
+      if (this.snake.leftArena() || this.snake.selfCollision()) {
+        this.stop();
+        return;
+      }
+
+      this.ctx.clearRect(0, 0, COLUMN_COUNT * CELL_SIZE, ROW_COUNT * CELL_SIZE);
+
+      this.entities.forEach((entity) => {
+        if (entity.draw) {
+          entity.draw();
+        }
+      });
+    }
+
+    this.tick = this.tick + 1;
   }
 
   getEmptyCells() {
