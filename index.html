@@ -11,13 +11,20 @@
   </head>
 
   <body>
+    <div class="HUD">
+      <div>Score: <strong id="score">0</strong></div>
+      <div>Highscore: <strong id="highscore">0</strong></div>
+    </div>
     <canvas width="320" height="240" id="canvas"></canvas>
+    <div class="Interface">
+      <div class="InterfaceMenu">
+        <button id="start">Start</button>
 
-    <button id="start">Start</button>
+        <button id="stop">Stop</button>
+      </div>
 
-    <button id="stop">Stop</button>
-
-    <p>Difficulty</p>
-    <input type="range" min="1" max="4" id="difficulty-range" />
+      <p>Difficulty</p>
+      <input type="range" min="1" max="4" id="difficulty-range" />
+    </div>
   </body>
 </html>

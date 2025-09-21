@@ -29,3 +29,17 @@ canvas {
   width: calc(var(--column-count) * var(--cell-size));
   height: calc(var(--row-count) * var(--cell-size));
 }
+
+.HUD {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 240px;
+}
+
+.Interface {
+  flex-direction: column;
+  justify-items: center;
+  gap: 8px;
+  padding: 4px;
+}
