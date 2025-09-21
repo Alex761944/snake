@@ -1,6 +1,13 @@
 const CELL_SIZE = 16;
 const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
+const GAME_SPEEDS = {
+  1: 120,
+  2: 90,
+  3: 60,
+  4: 30,
+};
+console.log(GAME_SPEEDS[3]);
 
 class Game {
   constructor() {
