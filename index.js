@@ -23,6 +23,8 @@ class Game {
     this.tick = 0;
 
     this.canvas = document.querySelector("#canvas");
+    this.difficultyInput = document.querySelector("#difficulty-range");
+    this.difficultyValue = this.difficultyInput.value;
     this.ctx = this.canvas.getContext("2d");
     this.entities = [];
     this.cells = [];
@@ -90,6 +92,8 @@ class Game {
     this.entities.push(this.snake);
 
     this.entities.push(this.food);
+
+    this.difficultyInput.disabled = true;
 
     /* Run game loop 60 times per second */
     this.interval = setInterval(this.update.bind(this), 1000 / 60);
