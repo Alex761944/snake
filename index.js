@@ -16,14 +16,17 @@ class Game {
     this.tick = 0;
 
     this.difficultyInput = document.querySelector("#difficulty-range");
-
     this.scoreDisplay = document.querySelector("#score");
-    this.score = 0;
-
     this.highscoreDisplay = document.querySelector("#highscore");
-
     this.canvas = document.querySelector("#canvas");
+    this.startButtonElement = document.querySelector("#start");
+    this.stopButtonElement = document.querySelector("#stop");
+
+    this.score = 0;
+    this.highscore = 0;
+
     this.ctx = this.canvas.getContext("2d");
+
     this.entities = [];
     this.cells = [];
 
@@ -33,11 +36,11 @@ class Game {
       }
     }
 
-    document.querySelector("#start").addEventListener("click", () => {
+    this.startButtonElement.addEventListener("click", () => {
       this.start();
     });
 
-    document.querySelector("#stop").addEventListener("click", () => {
+    this.stopButtonElement.addEventListener("click", () => {
       this.stop();
     });
 
@@ -76,23 +79,21 @@ class Game {
   }
 
   start() {
-    if (this.running) {
-      return;
-    }
     console.log("start");
+
+    /* Reset all entities and score if a game was already running */
+    this.setScore(0);
+    this.entities = [];
 
     this.difficultyValue = Number(this.difficultyInput.value);
 
-    this.running = true;
-
+    this.startButtonElement.disabled = "disabled";
     this.difficultyInput.disabled = "disabled";
 
     this.snake = new Snake(this.ctx);
-
-    this.food = new Food(this.ctx);
-
     this.entities.push(this.snake);
 
+    this.food = new Food(this.ctx);
     this.entities.push(this.food);
 
     /* Run game loop 60 times per second */
@@ -101,6 +102,16 @@ class Game {
 
   stop() {
     console.log("stop");
+
+    if (this.score > this.highscore) {
+      this.highscore = this.score;
+      this.highscoreDisplay.textContent = this.highscore;
+    }
+
+    this.difficultyInput.removeAttribute("disabled");
+    this.startButtonElement.removeAttribute("disabled");
+
+    this.startButtonElement.textContent = "New Game";
 
     clearInterval(this.interval);
   }
@@ -116,7 +127,7 @@ class Game {
 
       if (foodCollision) {
         this.food.move(this.getEmptyCells());
-        this.increaseScore();
+        this.setScore(this.score + this.difficultyValue);
       }
 
       if (this.snake.leftArena() || this.snake.selfCollision()) {
@@ -136,9 +147,9 @@ class Game {
     this.tick = this.tick + 1;
   }
 
-  increaseScore() {
-    this.score = this.score + this.difficultyValue;
-    this.scoreDisplay.textContent = this.score;
+  setScore(score) {
+    this.score = score;
+    this.scoreDisplay.textContent = score;
   }
 
   getEmptyCells() {
