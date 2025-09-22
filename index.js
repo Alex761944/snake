@@ -1,12 +1,6 @@
 const CELL_SIZE = 16;
 const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
-const GAME_SPEEDS = {
-  1: 30,
-  2: 60,
-  3: 90,
-  4: 120,
-};
 
 class Game {
   constructor() {
@@ -22,6 +16,11 @@ class Game {
     this.tick = 0;
 
     this.difficultyInput = document.querySelector("#difficulty-range");
+
+    this.scoreDisplay = document.querySelector("#score");
+    this.score = 0;
+
+    this.highscoreDisplay = document.querySelector("#highscore");
 
     this.canvas = document.querySelector("#canvas");
     this.ctx = this.canvas.getContext("2d");
@@ -84,11 +83,9 @@ class Game {
 
     this.difficultyValue = Number(this.difficultyInput.value);
 
-    this.gameSpeed = GAME_SPEEDS[this.difficultyValue];
-
-    console.log(this.gameSpeed);
-
     this.running = true;
+
+    this.difficultyInput.disabled = "disabled";
 
     this.snake = new Snake(this.ctx);
 
@@ -99,7 +96,7 @@ class Game {
     this.entities.push(this.food);
 
     /* Run game loop 60 times per second */
-    this.interval = setInterval(this.update.bind(this), 1000 / this.gameSpeed);
+    this.interval = setInterval(this.update.bind(this), 1000 / 60);
   }
 
   stop() {
@@ -111,14 +108,15 @@ class Game {
   update() {
     console.log("update");
 
-    /* Things that should only happen every 60 frames */
-    if (this.tick % 60 === 0) {
+    /* Things that should happen every X frames. X depends on the difficulty */
+    if (this.tick % (60 / this.difficultyValue) === 0) {
       this.snake.move();
 
       const foodCollision = this.snake.foodCollision(this.food);
 
       if (foodCollision) {
         this.food.move(this.getEmptyCells());
+        this.increaseScore();
       }
 
       if (this.snake.leftArena() || this.snake.selfCollision()) {
@@ -136,6 +134,11 @@ class Game {
     }
 
     this.tick = this.tick + 1;
+  }
+
+  increaseScore() {
+    this.score = this.score + this.difficultyValue;
+    this.scoreDisplay.textContent = this.score;
   }
 
   getEmptyCells() {
