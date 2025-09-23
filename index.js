@@ -3,7 +3,7 @@ const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
 const CURRENT_DIFFFICULTY_TEXT = {
   1: "Easy",
-  2: "Avanced",
+  2: "Advanced",
   3: "Normal",
   4: "Hard",
 };
