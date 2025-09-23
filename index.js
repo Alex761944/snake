@@ -1,6 +1,12 @@
 const CELL_SIZE = 16;
 const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
+const CURRENT_DIFFFICULTY_TEXT = {
+  1: "Easy",
+  2: "Avanced",
+  3: "Normal",
+  4: "Hard",
+};
 
 class Game {
   constructor() {
@@ -21,6 +27,7 @@ class Game {
     this.canvas = document.querySelector("#canvas");
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
+    this.difficultyText = document.querySelector("#difficulty-text");
 
     this.score = 0;
     this.highscore = 0;
@@ -35,6 +42,12 @@ class Game {
         this.cells.push({ column, row });
       }
     }
+
+    this.difficultyInput.addEventListener("input", () => {
+      this.difficultyValue = Number(this.difficultyInput.value);
+      this.difficultyText.textContent =
+        CURRENT_DIFFFICULTY_TEXT[this.difficultyValue];
+    });
 
     this.startButtonElement.addEventListener("click", () => {
       this.start();
@@ -86,6 +99,9 @@ class Game {
     this.entities = [];
 
     this.difficultyValue = Number(this.difficultyInput.value);
+
+    this.difficultyText.textContent =
+      CURRENT_DIFFFICULTY_TEXT[this.difficultyValue];
 
     this.startButtonElement.disabled = "disabled";
     this.difficultyInput.disabled = "disabled";
