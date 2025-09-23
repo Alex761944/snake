@@ -98,11 +98,6 @@ class Game {
     this.setScore(0);
     this.entities = [];
 
-    this.difficultyValue = Number(this.difficultyInput.value);
-
-    this.difficultyText.textContent =
-      CURRENT_DIFFFICULTY_TEXT[this.difficultyValue];
-
     this.startButtonElement.disabled = "disabled";
     this.difficultyInput.disabled = "disabled";
 
