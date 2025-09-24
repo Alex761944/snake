@@ -1,6 +1,12 @@
 const CELL_SIZE = 16;
 const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
+const DIFFICULTY_TEXTS = {
+  1: "Easy",
+  3: "Normal",
+  2: "Advanced",
+  4: "Hard",
+};
 
 class Game {
   constructor() {
@@ -21,9 +27,11 @@ class Game {
     this.canvas = document.querySelector("#canvas");
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
+    this.difficultyText = document.querySelector("#difficulty-text");
+    this.resetHighscoreElement = document.querySelector("#reset-highscore");
 
     this.score = 0;
-    this.highscore = 0;
+    this.setHighscore(this.loadHighscoreFromLocalStorage());
 
     this.ctx = this.canvas.getContext("2d");
 
@@ -36,12 +44,25 @@ class Game {
       }
     }
 
+    this.difficultyValue = Number(this.difficultyInput?.value);
+    this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
+
+    this.difficultyInput.addEventListener("input", () => {
+      this.difficultyValue = Number(this.difficultyInput.value);
+      this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
+    });
+
     this.startButtonElement.addEventListener("click", () => {
       this.start();
     });
 
     this.stopButtonElement.addEventListener("click", () => {
       this.stop();
+    });
+
+    this.resetHighscoreElement.addEventListener("click", () => {
+      this.setHighscore(0);
+      this.saveHighscoreToLocalStorage(0);
     });
 
     window.addEventListener("keydown", ({ key }) => {
@@ -85,8 +106,6 @@ class Game {
     this.setScore(0);
     this.entities = [];
 
-    this.difficultyValue = Number(this.difficultyInput.value);
-
     this.startButtonElement.disabled = "disabled";
     this.difficultyInput.disabled = "disabled";
 
@@ -106,6 +125,8 @@ class Game {
     if (this.score > this.highscore) {
       this.highscore = this.score;
       this.highscoreDisplay.textContent = this.highscore;
+
+      this.saveHighscoreToLocalStorage(this.highscore);
     }
 
     this.difficultyInput.removeAttribute("disabled");
@@ -150,6 +171,25 @@ class Game {
   setScore(score) {
     this.score = score;
     this.scoreDisplay.textContent = score;
+  }
+
+  setHighscore(highscore) {
+    this.highscore = highscore;
+    this.highscoreDisplay.textContent = highscore;
+  }
+
+  saveHighscoreToLocalStorage(highscore) {
+    localStorage.setItem("highscore", highscore);
+  }
+
+  loadHighscoreFromLocalStorage() {
+    const highscoreString = localStorage.getItem("highscore");
+
+    if (!highscoreString) {
+      return 0;
+    }
+
+    return Number(highscoreString);
   }
 
   getEmptyCells() {
