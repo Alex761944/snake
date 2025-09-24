@@ -28,9 +28,10 @@ class Game {
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
     this.difficultyText = document.querySelector("#difficulty-text");
+    this.resetHighscoreElement = document.querySelector("#reset-highscore");
 
     this.score = 0;
-    this.highscore = 0;
+    this.setHighscore(this.loadHighscoreFromLocalStorage());
 
     this.ctx = this.canvas.getContext("2d");
 
@@ -57,6 +58,11 @@ class Game {
 
     this.stopButtonElement.addEventListener("click", () => {
       this.stop();
+    });
+
+    this.resetHighscoreElement.addEventListener("click", () => {
+      this.setHighscore(0);
+      this.saveHighscoreToLocalStorage(0);
     });
 
     window.addEventListener("keydown", ({ key }) => {
@@ -119,6 +125,8 @@ class Game {
     if (this.score > this.highscore) {
       this.highscore = this.score;
       this.highscoreDisplay.textContent = this.highscore;
+
+      this.saveHighscoreToLocalStorage(this.highscore);
     }
 
     this.difficultyInput.removeAttribute("disabled");
@@ -163,6 +171,25 @@ class Game {
   setScore(score) {
     this.score = score;
     this.scoreDisplay.textContent = score;
+  }
+
+  setHighscore(highscore) {
+    this.highscore = highscore;
+    this.highscoreDisplay.textContent = highscore;
+  }
+
+  saveHighscoreToLocalStorage(highscore) {
+    localStorage.setItem("highscore", highscore);
+  }
+
+  loadHighscoreFromLocalStorage() {
+    const highscoreString = localStorage.getItem("highscore");
+
+    if (!highscoreString) {
+      return 0;
+    }
+
+    return Number(highscoreString);
   }
 
   getEmptyCells() {
