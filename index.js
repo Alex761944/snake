@@ -1,10 +1,10 @@
 const CELL_SIZE = 16;
 const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
-const CURRENT_DIFFFICULTY_TEXT = {
+const DIFFICULTY_TEXTS = {
   1: "Easy",
-  2: "Advanced",
   3: "Normal",
+  2: "Advanced",
   4: "Hard",
 };
 
@@ -43,10 +43,12 @@ class Game {
       }
     }
 
+    this.difficultyValue = Number(this.difficultyInput?.value);
+    this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
+
     this.difficultyInput.addEventListener("input", () => {
       this.difficultyValue = Number(this.difficultyInput.value);
-      this.difficultyText.textContent =
-        CURRENT_DIFFFICULTY_TEXT[this.difficultyValue];
+      this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
     });
 
     this.startButtonElement.addEventListener("click", () => {
