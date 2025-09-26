@@ -253,10 +253,18 @@ class Snake {
       {
         column: 5,
         row: 5,
+        connectionTop: false,
+        connectionRight: false,
+        connectionBottom: false,
+        connectionLeft: true,
       },
       {
         column: 4,
         row: 5,
+        connectionTop: false,
+        connectionRight: true,
+        connectionBottom: false,
+        connectionLeft: false,
       },
     ];
   }
@@ -267,7 +275,7 @@ class Snake {
 
   move() {
     const head = this.body[0];
-    const newHead = { column: head.column, row: head.row };
+    const newHead = { ...head };
 
     /* Check legality of move */
     if (
@@ -299,12 +307,16 @@ class Snake {
     /* Move in direction */
     if (this.direction === "right") {
       newHead.column += 1;
+      newHead.connectionLeft = true;
     } else if (this.direction === "up") {
       newHead.row -= 1;
+      newHead.connectionBottom = true;
     } else if (this.direction === "down") {
       newHead.row += 1;
+      newHead.connectionTop = true;
     } else if (this.direction === "left") {
       newHead.column -= 1;
+      newHead.connectionRight = true;
     }
 
     this.body.unshift(newHead);
@@ -347,15 +359,40 @@ class Snake {
   }
 
   draw() {
-    this.ctx.fillStyle = "white";
-
     this.body.forEach((segment) => {
+      this.ctx.fillStyle = "white";
       this.ctx.fillRect(
         segment.column * CELL_SIZE + this.margin,
         segment.row * CELL_SIZE + this.margin,
         this.segmentSize,
         this.segmentSize
       );
+      console.log(segment);
+      if (segment.connectionTop) {
+      }
+
+      if (segment.connectionRight) {
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(
+          segment.column * CELL_SIZE + this.margin + this.segmentSize,
+          segment.row * CELL_SIZE + this.margin + this.margin,
+          this.margin,
+          this.segmentSize - this.margin
+        );
+      }
+
+      if (segment.connectionBottom) {
+      }
+
+      if (segment.connectionLeft) {
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(
+          segment.column * CELL_SIZE,
+          segment.row * CELL_SIZE + this.margin + this.margin,
+          this.margin,
+          this.segmentSize - this.margin
+        );
+      }
     });
   }
 }

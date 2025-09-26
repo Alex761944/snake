@@ -12,6 +12,7 @@
 
 html,
 body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   margin: 0;
   padding: 0;
   background-color: black;
@@ -35,6 +36,17 @@ canvas {
   border: 4px solid white;
   width: calc(var(--column-count) * var(--cell-size));
   height: calc(var(--row-count) * var(--cell-size));
+}
+
+.Button {
+  width: 100%;
+  font-size: small;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px 16px;
+  border: rgb(0, 184, 0), dashed;
+  background-color: rgb(107, 107, 107);
+  color: rgb(255, 21, 21);
 }
 
 .Scoreboard {
