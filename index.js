@@ -72,25 +72,25 @@ class Game {
       if (!snake) return;
 
       if (
-        key === "ArrowUp" &&
+        (key === "ArrowUp" || key === "w") &&
         snake.direction !== "up" &&
         snake.direction !== "down"
       ) {
         snake.desiredDirection = "up";
       } else if (
-        key === "ArrowDown" &&
+        (key === "ArrowDown" || key === "s") &&
         snake.direction !== "up" &&
         snake.direction !== "down"
       ) {
         snake.desiredDirection = "down";
       } else if (
-        key === "ArrowLeft" &&
+        (key === "ArrowLeft" || key === "a") &&
         snake.direction !== "left" &&
         snake.direction !== "right"
       ) {
         snake.desiredDirection = "left";
       } else if (
-        key === "ArrowRight" &&
+        (key === "ArrowRight" || key === "d") &&
         snake.direction !== "left" &&
         snake.direction !== "right"
       ) {
@@ -275,7 +275,7 @@ class Snake {
 
   move() {
     const head = this.body[0];
-    const newHead = { ...head };
+    const newHead = { column: head.column, row: head.row };
 
     /* Check legality of move */
     if (
@@ -308,15 +308,19 @@ class Snake {
     if (this.direction === "right") {
       newHead.column += 1;
       newHead.connectionLeft = true;
+      this.body[0].connectionRight = true;
     } else if (this.direction === "up") {
       newHead.row -= 1;
       newHead.connectionBottom = true;
+      this.body[0].connectionTop = true;
     } else if (this.direction === "down") {
       newHead.row += 1;
       newHead.connectionTop = true;
+      this.body[0].connectionBottom = true;
     } else if (this.direction === "left") {
       newHead.column -= 1;
       newHead.connectionRight = true;
+      this.body[0].connectionLeft = true;
     }
 
     this.body.unshift(newHead);
@@ -326,6 +330,28 @@ class Snake {
     } else {
       this.body.pop();
     }
+
+    /* Remove irrelevant connection on the last segment */
+    const lastSegment = this.body[this.body.length - 1];
+    const secondLastSegment = this.body[this.body.length - 2];
+
+    lastSegment.connectionTop =
+      lastSegment.row > secondLastSegment.row &&
+      lastSegment.column === secondLastSegment.column;
+
+    lastSegment.connectionRight =
+      lastSegment.row === secondLastSegment.row &&
+      lastSegment.column < secondLastSegment.column;
+
+    lastSegment.connectionBottom =
+      lastSegment.row < secondLastSegment.row &&
+      lastSegment.column === secondLastSegment.column;
+
+    lastSegment.connectionLeft =
+      lastSegment.row === secondLastSegment.row &&
+      lastSegment.column > secondLastSegment.column;
+
+    console.log(lastSegment);
   }
 
   leftArena() {
@@ -359,16 +385,28 @@ class Snake {
   }
 
   draw() {
-    this.body.forEach((segment) => {
-      this.ctx.fillStyle = "white";
+    this.body.forEach((segment, index) => {
+      if (index === 0) {
+        this.ctx.fillStyle = "#F7B538";
+      } else {
+        this.ctx.fillStyle = "#DB7C26";
+      }
+
       this.ctx.fillRect(
         segment.column * CELL_SIZE + this.margin,
         segment.row * CELL_SIZE + this.margin,
         this.segmentSize,
         this.segmentSize
       );
-      console.log(segment);
+
       if (segment.connectionTop) {
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(
+          segment.column * CELL_SIZE + this.margin + this.margin,
+          segment.row * CELL_SIZE,
+          this.segmentSize - this.margin - this.margin,
+          this.margin
+        );
       }
 
       if (segment.connectionRight) {
@@ -377,11 +415,18 @@ class Snake {
           segment.column * CELL_SIZE + this.margin + this.segmentSize,
           segment.row * CELL_SIZE + this.margin + this.margin,
           this.margin,
-          this.segmentSize - this.margin
+          this.segmentSize - this.margin - this.margin
         );
       }
 
       if (segment.connectionBottom) {
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(
+          segment.column * CELL_SIZE + this.margin + this.margin,
+          segment.row * CELL_SIZE + this.margin + this.segmentSize,
+          this.segmentSize - this.margin - this.margin,
+          this.margin
+        );
       }
 
       if (segment.connectionLeft) {
@@ -390,7 +435,7 @@ class Snake {
           segment.column * CELL_SIZE,
           segment.row * CELL_SIZE + this.margin + this.margin,
           this.margin,
-          this.segmentSize - this.margin
+          this.segmentSize - this.margin - this.margin
         );
       }
     });

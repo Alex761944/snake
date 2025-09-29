@@ -2,6 +2,15 @@
   --cell-size: 16px;
   --column-count: 20;
   --row-count: 15;
+
+  --canvas-background: black;
+  --canvas-border: white;
+
+  --text-color: #b6c454;
+
+  --button-text-color: #ffe1a8;
+  --button-background-color: #407076;
+  --button-border-color: #6da34d;
 }
 
 *,
@@ -16,7 +25,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: black;
-  color: white;
+  color: var(--text-color);
 }
 
 body {
@@ -32,8 +41,8 @@ p {
 }
 
 canvas {
-  background-color: black;
-  border: 4px solid white;
+  background-color: var(--canvas-background);
+  border: 4px solid var(--canvas-border);
   width: calc(var(--column-count) * var(--cell-size));
   height: calc(var(--row-count) * var(--cell-size));
 }
@@ -44,9 +53,9 @@ canvas {
   cursor: pointer;
   border-radius: 8px;
   padding: 8px 16px;
-  border: rgb(0, 184, 0), dashed;
-  background-color: rgb(107, 107, 107);
-  color: rgb(255, 21, 21);
+  border: var(--button-border-color), dashed;
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
 }
 
 .Scoreboard {
