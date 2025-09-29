@@ -24,6 +24,7 @@ class Game {
     this.difficultyInput = document.querySelector("#difficulty-range");
     this.scoreDisplay = document.querySelector("#score");
     this.highscoreDisplay = document.querySelector("#highscore");
+    this.moneyDisplay = document.querySelector("#money");
     this.canvas = document.querySelector("#canvas");
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
@@ -31,7 +32,11 @@ class Game {
     this.resetHighscoreElement = document.querySelector("#reset-highscore");
 
     this.score = 0;
-    this.setHighscore(this.loadHighscoreFromLocalStorage());
+
+    const { highscore, money } = this.loadGameProgressFromLocalStorage();
+
+    this.setHighscore(highscore);
+    this.setMoney(money);
 
     this.ctx = this.canvas.getContext("2d");
 
@@ -62,7 +67,10 @@ class Game {
 
     this.resetHighscoreElement.addEventListener("click", () => {
       this.setHighscore(0);
-      this.saveHighscoreToLocalStorage(0);
+
+      const gameProgress = { highscore: 0, money: this.money };
+
+      this.saveGameProgressToLocalStorage(gameProgress);
     });
 
     window.addEventListener("keydown", ({ key }) => {
@@ -126,7 +134,9 @@ class Game {
       this.highscore = this.score;
       this.highscoreDisplay.textContent = this.highscore;
 
-      this.saveHighscoreToLocalStorage(this.highscore);
+      const gameProgress = { highscore: this.highscore, money: this.money };
+
+      this.saveGameProgressToLocalStorage(gameProgress);
     }
 
     this.difficultyInput.removeAttribute("disabled");
@@ -149,6 +159,7 @@ class Game {
       if (foodCollision) {
         this.food.move(this.getEmptyCells());
         this.setScore(this.score + this.difficultyValue);
+        this.setMoney(this.money + this.food.value);
       }
 
       if (this.snake.leftArena() || this.snake.selfCollision()) {
@@ -168,6 +179,11 @@ class Game {
     this.tick = this.tick + 1;
   }
 
+  setMoney(money) {
+    this.money = money;
+    this.moneyDisplay.textContent = money;
+  }
+
   setScore(score) {
     this.score = score;
     this.scoreDisplay.textContent = score;
@@ -178,18 +194,19 @@ class Game {
     this.highscoreDisplay.textContent = highscore;
   }
 
-  saveHighscoreToLocalStorage(highscore) {
-    localStorage.setItem("highscore", highscore);
+  saveGameProgressToLocalStorage(gameProgress) {
+    /* highscore, money */
+    localStorage.setItem("game-progress", JSON.stringify(gameProgress));
   }
 
-  loadHighscoreFromLocalStorage() {
-    const highscoreString = localStorage.getItem("highscore");
+  loadGameProgressFromLocalStorage() {
+    const gameProgressString = localStorage.getItem("game-progress");
 
-    if (!highscoreString) {
-      return 0;
+    if (!gameProgressString) {
+      return { highscore: 0, money: 0 };
     }
 
-    return Number(highscoreString);
+    return JSON.parse(gameProgressString);
   }
 
   getEmptyCells() {
@@ -216,6 +233,7 @@ class Food {
     this.column = 10;
     this.row = 5;
     this.name = "food";
+    this.value = 1;
   }
 
   move(emptyCells) {
