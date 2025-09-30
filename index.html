@@ -11,6 +11,10 @@
   </head>
 
   <body>
+    <div class="Hidden">
+      <img id="apple" src="/images/Apple.png" alt="apple" />
+    </div>
+
     <div class="Scoreboard">
       <p>Score: <strong id="score">0</strong></p>
 
@@ -19,7 +23,10 @@
       <p>Money: <strong id="money">0</strong></p>
     </div>
 
-    <canvas id="canvas" width="320" height="240"></canvas>
+    <div class="Display">
+      <canvas id="canvas" width="320" height="240"></canvas>
+      <button class="Button" id="unlock-banana">Unlock Banana</button>
+    </div>
 
     <div class="Interface">
       <button class="Button" id="start">Start</button>
