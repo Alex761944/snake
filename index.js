@@ -236,6 +236,7 @@ class Food {
     this.value = 1;
 
     this.appleImageElement = document.querySelector("#apple");
+    this.bananaImageElement = document.querySelector("#banana");
   }
 
   move(emptyCells) {
