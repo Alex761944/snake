@@ -44,8 +44,8 @@ p {
   margin: 0;
 }
 
-.Hidden {
-  display: none;
+.u-Hidden {
+  display: none !important;
 }
 
 canvas {

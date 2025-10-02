@@ -226,7 +226,7 @@ class Game {
   }
 }
 class Food {
-  constructor(ctx, appleElement) {
+  constructor(ctx) {
     this.ctx = ctx;
     this.margin = 1;
     this.foodSize = CELL_SIZE - this.margin * 2;
