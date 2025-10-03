@@ -30,13 +30,16 @@ class Game {
     this.stopButtonElement = document.querySelector("#stop");
     this.difficultyText = document.querySelector("#difficulty-text");
     this.resetHighscoreElement = document.querySelector("#reset-highscore");
+    this.unlockBananaButtonElement = document.querySelector("#unlock-banana");
 
     this.score = 0;
 
-    const { highscore, money } = this.loadGameProgressFromLocalStorage();
+    const { highscore, money, upgrades } =
+      this.loadGameProgressFromLocalStorage();
 
     this.setHighscore(highscore);
     this.setMoney(money);
+    this.setUpgrades(upgrades);
 
     this.ctx = this.canvas.getContext("2d");
 
@@ -57,6 +60,24 @@ class Game {
       this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
     });
 
+    if (this.upgrades.includes("banana")) {
+      this.setPurchaseStyle(this.unlockBananaButtonElement);
+    }
+
+    this.unlockBananaButtonElement.addEventListener("click", () => {
+      this.upgrades.push("banana");
+
+      this.setPurchaseStyle(this.unlockBananaButtonElement);
+
+      const gameProgress = {
+        highscore: this.highscore,
+        money: this.money,
+        upgrades: this.upgrades,
+      };
+
+      this.saveGameProgressToLocalStorage(gameProgress);
+    });
+
     this.startButtonElement.addEventListener("click", () => {
       this.start();
     });
@@ -68,7 +89,7 @@ class Game {
     this.resetHighscoreElement.addEventListener("click", () => {
       this.setHighscore(0);
 
-      const gameProgress = { highscore: 0, money: this.money };
+      const gameProgress = { highscore: 0, money: this.money, upgrades: [] };
 
       this.saveGameProgressToLocalStorage(gameProgress);
     });
@@ -120,7 +141,8 @@ class Game {
     this.snake = new Snake(this.ctx);
     this.entities.push(this.snake);
 
-    this.food = new Food(this.ctx);
+    const type = this.upgrades.includes("banana") ? "banana" : "apple";
+    this.food = new Food(this.ctx, type);
     this.entities.push(this.food);
 
     /* Run game loop 60 times per second */
@@ -134,7 +156,11 @@ class Game {
       this.highscore = this.score;
       this.highscoreDisplay.textContent = this.highscore;
 
-      const gameProgress = { highscore: this.highscore, money: this.money };
+      const gameProgress = {
+        highscore: this.highscore,
+        money: this.money,
+        upgrades: this.upgrades,
+      };
 
       this.saveGameProgressToLocalStorage(gameProgress);
     }
@@ -147,6 +173,11 @@ class Game {
     clearInterval(this.interval);
   }
 
+  getGambleResult(successPercentage) {
+    const randomNumber = Math.random() * 100;
+    return randomNumber < successPercentage;
+  }
+
   update() {
     console.log("update");
 
@@ -157,6 +188,11 @@ class Game {
       const foodCollision = this.snake.foodCollision(this.food);
 
       if (foodCollision) {
+        if (this.upgrades.includes("banana")) {
+          const newFoodType = this.getGambleResult(50) ? "banana" : "apple";
+
+          this.food.setType(newFoodType);
+        }
         this.food.move(this.getEmptyCells());
         this.setScore(this.score + this.difficultyValue);
         this.setMoney(this.money + this.food.value);
@@ -179,6 +215,16 @@ class Game {
     this.tick = this.tick + 1;
   }
 
+  setPurchaseStyle(buttonElement) {
+    buttonElement.disabled = "disabled";
+
+    buttonElement.classList.add("PurchaseButton--Purchased");
+  }
+
+  setUpgrades(upgrades) {
+    this.upgrades = upgrades;
+  }
+
   setMoney(money) {
     this.money = money;
     this.moneyDisplay.textContent = money;
@@ -195,7 +241,7 @@ class Game {
   }
 
   saveGameProgressToLocalStorage(gameProgress) {
-    /* highscore, money */
+    /* highscore, money, upgrades */
     localStorage.setItem("game-progress", JSON.stringify(gameProgress));
   }
 
@@ -203,7 +249,7 @@ class Game {
     const gameProgressString = localStorage.getItem("game-progress");
 
     if (!gameProgressString) {
-      return { highscore: 0, money: 0 };
+      return { highscore: 0, money: 0, upgrades: [] };
     }
 
     return JSON.parse(gameProgressString);
@@ -226,7 +272,7 @@ class Game {
   }
 }
 class Food {
-  constructor(ctx) {
+  constructor(ctx, type) {
     this.ctx = ctx;
     this.margin = 1;
     this.foodSize = CELL_SIZE - this.margin * 2;
@@ -234,9 +280,14 @@ class Food {
     this.row = 5;
     this.name = "food";
     this.value = 1;
+    this.type = type;
 
     this.appleImageElement = document.querySelector("#apple");
     this.bananaImageElement = document.querySelector("#banana");
+  }
+
+  setType(type) {
+    this.type = type;
   }
 
   move(emptyCells) {
@@ -248,8 +299,11 @@ class Food {
   }
 
   draw() {
+    const imageToDraw =
+      this.type === "banana" ? this.bananaImageElement : this.appleImageElement;
+
     this.ctx.drawImage(
-      this.appleImageElement,
+      imageToDraw,
       this.column * CELL_SIZE,
       this.row * CELL_SIZE,
       CELL_SIZE,
