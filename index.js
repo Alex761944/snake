@@ -234,6 +234,9 @@ class Food {
     this.row = 5;
     this.name = "food";
     this.value = 1;
+
+    this.appleImageElement = document.querySelector("#apple");
+    this.bananaImageElement = document.querySelector("#banana");
   }
 
   move(emptyCells) {
@@ -245,17 +248,13 @@ class Food {
   }
 
   draw() {
-    this.ctx.fillStyle = "red";
-
-    this.ctx.beginPath();
-    this.ctx.arc(
-      this.column * CELL_SIZE + CELL_SIZE / 2,
-      this.row * CELL_SIZE + CELL_SIZE / 2,
-      CELL_SIZE / 2 - this.margin,
-      0,
-      2 * Math.PI
+    this.ctx.drawImage(
+      this.appleImageElement,
+      this.column * CELL_SIZE,
+      this.row * CELL_SIZE,
+      CELL_SIZE,
+      CELL_SIZE
     );
-    this.ctx.fill();
   }
 }
 
