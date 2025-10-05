@@ -29,7 +29,7 @@ class Game {
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
     this.difficultyTextElement = document.querySelector("#difficulty-text");
-    this.resetHighscoreElement = document.querySelector("#reset-highscore");
+    this.resetProgressElement = document.querySelector("#reset-highscore");
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
 
     this.score = 0;
@@ -40,6 +40,9 @@ class Game {
     this.setHighscore(highscore);
     this.setMoney(money);
     this.setUpgrades(upgrades);
+
+    const difficultyString = localStorage.getItem("difficulty") || "2";
+    this.difficultyInputElement.value = difficultyString;
 
     this.ctx = this.canvasElement.getContext("2d");
 
@@ -60,6 +63,8 @@ class Game {
       this.difficultyValue = Number(this.difficultyInputElement.value);
       this.difficultyTextElement.textContent =
         DIFFICULTY_TEXTS[this.difficultyValue];
+
+      localStorage.setItem("difficulty", this.difficultyInputElement.value);
     });
 
     this.upgradeButtonElements.forEach((upgradeButtonElement) => {
@@ -92,10 +97,15 @@ class Game {
       this.stop();
     });
 
-    this.resetHighscoreElement.addEventListener("click", () => {
+    this.resetProgressElement.addEventListener("click", () => {
       this.setHighscore(0);
 
       const gameProgress = { highscore: 0, money: this.money, upgrades: [] };
+
+      this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+        upgradeButtonElement.removeAttribute("disabled");
+        upgradeButtonElement.classList.remove("PurchaseButton--Purchased");
+      });
 
       this.saveGameProgressToLocalStorage(gameProgress);
     });
