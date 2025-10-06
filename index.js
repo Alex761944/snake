@@ -29,7 +29,7 @@ class Game {
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
     this.difficultyTextElement = document.querySelector("#difficulty-text");
-    this.resetProgressElement = document.querySelector("#reset-highscore");
+    this.resetProgressElement = document.querySelector("#reset-progress");
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
 
     this.score = 0;
@@ -99,6 +99,7 @@ class Game {
 
     this.resetProgressElement.addEventListener("click", () => {
       this.setHighscore(0);
+      this.setMoney(0);
 
       const gameProgress = { highscore: 0, money: this.money, upgrades: [] };
 
@@ -202,6 +203,7 @@ class Game {
       this.snake.move();
 
       const foodCollision = this.snake.foodCollision(this.food);
+      const moneyValue = this.food.value;
 
       if (foodCollision) {
         if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
@@ -211,13 +213,15 @@ class Game {
           this.getGambleResult(50)
         ) {
           this.food.setType("banana");
+        } else if (this.upgrades.includes("melon") && this.getGambleResult(5)) {
+          this.food.setType("melon");
         } else {
           this.food.setType("apple");
         }
 
         this.food.move(this.getEmptyCells());
         this.setScore(this.score + this.difficultyValue);
-        this.setMoney(this.money + this.food.value);
+        this.setMoney(this.money + moneyValue);
       }
 
       if (this.snake.leftArena() || this.snake.selfCollision()) {
@@ -301,16 +305,33 @@ class Food {
     this.column = 10;
     this.row = 5;
     this.name = "food";
-    this.value = 1;
     this.type = type;
 
     this.appleImageElement = document.querySelector("#apple");
     this.bananaImageElement = document.querySelector("#banana");
     this.cherryImageElement = document.querySelector("#cherry");
+    this.melonImageElement = document.querySelector("#melon");
+
+    this.setType(type);
   }
 
   setType(type) {
     this.type = type;
+
+    switch (type) {
+      case "apple":
+        this.value = 1;
+        break;
+      case "banana":
+        this.value = 2;
+        break;
+      case "cherry":
+        this.value = 5;
+        break;
+      case "melon":
+        this.value = 10;
+        break;
+    }
   }
 
   move(emptyCells) {
@@ -330,6 +351,9 @@ class Food {
         break;
       case "cherry":
         imageToDraw = this.cherryImageElement;
+        break;
+      case "melon":
+        imageToDraw = this.melonImageElement;
         break;
       case "apple":
       default:
