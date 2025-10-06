@@ -6,6 +6,7 @@ const DIFFICULTY_TEXTS = {
   3: "Normal",
   2: "Advanced",
   4: "Hard",
+  5: "Veteran",
 };
 
 class Game {
@@ -21,16 +22,16 @@ class Game {
 
     this.tick = 0;
 
-    this.difficultyInput = document.querySelector("#difficulty-range");
-    this.scoreDisplay = document.querySelector("#score");
-    this.highscoreDisplay = document.querySelector("#highscore");
-    this.moneyDisplay = document.querySelector("#money");
-    this.canvas = document.querySelector("#canvas");
+    this.difficultyInputElement = document.querySelector("#difficulty-range");
+    this.scoreDisplayTextElement = document.querySelector("#score");
+    this.highscoreDisplayTextElement = document.querySelector("#highscore");
+    this.moneyDisplayTextElement = document.querySelector("#money");
+    this.canvasElement = document.querySelector("#canvas");
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
-    this.difficultyText = document.querySelector("#difficulty-text");
-    this.resetHighscoreElement = document.querySelector("#reset-highscore");
-    this.unlockBananaButtonElement = document.querySelector("#unlock-banana");
+    this.difficultyTextElement = document.querySelector("#difficulty-text");
+    this.resetProgressElement = document.querySelector("#reset-progress");
+    this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
 
     this.score = 0;
 
@@ -41,7 +42,10 @@ class Game {
     this.setMoney(money);
     this.setUpgrades(upgrades);
 
-    this.ctx = this.canvas.getContext("2d");
+    const difficultyString = localStorage.getItem("difficulty") || "2";
+    this.difficultyInputElement.value = difficultyString;
+
+    this.ctx = this.canvasElement.getContext("2d");
 
     this.entities = [];
     this.cells = [];
@@ -52,30 +56,38 @@ class Game {
       }
     }
 
-    this.difficultyValue = Number(this.difficultyInput?.value);
-    this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
+    this.difficultyValue = Number(this.difficultyInputElement?.value);
+    this.difficultyTextElement.textContent =
+      DIFFICULTY_TEXTS[this.difficultyValue];
 
-    this.difficultyInput.addEventListener("input", () => {
-      this.difficultyValue = Number(this.difficultyInput.value);
-      this.difficultyText.textContent = DIFFICULTY_TEXTS[this.difficultyValue];
+    this.difficultyInputElement.addEventListener("input", () => {
+      this.difficultyValue = Number(this.difficultyInputElement.value);
+      this.difficultyTextElement.textContent =
+        DIFFICULTY_TEXTS[this.difficultyValue];
+
+      localStorage.setItem("difficulty", this.difficultyInputElement.value);
     });
 
-    if (this.upgrades.includes("banana")) {
-      this.setPurchaseStyle(this.unlockBananaButtonElement);
-    }
+    this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+      const upgrade = upgradeButtonElement.getAttribute("data-upgrade");
 
-    this.unlockBananaButtonElement.addEventListener("click", () => {
-      this.upgrades.push("banana");
+      upgradeButtonElement.addEventListener("click", () => {
+        this.upgrades.push(upgrade);
 
-      this.setPurchaseStyle(this.unlockBananaButtonElement);
+        this.setPurchaseStyle(upgradeButtonElement);
 
-      const gameProgress = {
-        highscore: this.highscore,
-        money: this.money,
-        upgrades: this.upgrades,
-      };
+        const gameProgress = {
+          highscore: this.highscore,
+          money: this.money,
+          upgrades: this.upgrades,
+        };
 
-      this.saveGameProgressToLocalStorage(gameProgress);
+        this.saveGameProgressToLocalStorage(gameProgress);
+      });
+
+      if (this.upgrades.includes(upgrade)) {
+        this.setPurchaseStyle(upgradeButtonElement);
+      }
     });
 
     this.startButtonElement.addEventListener("click", () => {
@@ -86,10 +98,16 @@ class Game {
       this.stop();
     });
 
-    this.resetHighscoreElement.addEventListener("click", () => {
+    this.resetProgressElement.addEventListener("click", () => {
       this.setHighscore(0);
+      this.setMoney(0);
 
       const gameProgress = { highscore: 0, money: this.money, upgrades: [] };
+
+      this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+        upgradeButtonElement.removeAttribute("disabled");
+        upgradeButtonElement.classList.remove("PurchaseButton--Purchased");
+      });
 
       this.saveGameProgressToLocalStorage(gameProgress);
     });
@@ -136,7 +154,7 @@ class Game {
     this.entities = [];
 
     this.startButtonElement.disabled = "disabled";
-    this.difficultyInput.disabled = "disabled";
+    this.difficultyInputElement.disabled = "disabled";
 
     this.snake = new Snake(this.ctx);
     this.entities.push(this.snake);
@@ -154,7 +172,7 @@ class Game {
 
     if (this.score > this.highscore) {
       this.highscore = this.score;
-      this.highscoreDisplay.textContent = this.highscore;
+      this.highscoreDisplayTextElement.textContent = this.highscore;
 
       const gameProgress = {
         highscore: this.highscore,
@@ -165,7 +183,7 @@ class Game {
       this.saveGameProgressToLocalStorage(gameProgress);
     }
 
-    this.difficultyInput.removeAttribute("disabled");
+    this.difficultyInputElement.removeAttribute("disabled");
     this.startButtonElement.removeAttribute("disabled");
 
     this.startButtonElement.textContent = "New Game";
@@ -186,16 +204,25 @@ class Game {
       this.snake.move();
 
       const foodCollision = this.snake.foodCollision(this.food);
+      const moneyValue = this.food.value;
 
       if (foodCollision) {
-        if (this.upgrades.includes("banana")) {
-          const newFoodType = this.getGambleResult(50) ? "banana" : "apple";
-
-          this.food.setType(newFoodType);
+        if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
+          this.food.setType("cherry");
+        } else if (
+          this.upgrades.includes("banana") &&
+          this.getGambleResult(50)
+        ) {
+          this.food.setType("banana");
+        } else if (this.upgrades.includes("melon") && this.getGambleResult(5)) {
+          this.food.setType("melon");
+        } else {
+          this.food.setType("apple");
         }
+
         this.food.move(this.getEmptyCells());
         this.setScore(this.score + this.difficultyValue);
-        this.setMoney(this.money + this.food.value);
+        this.setMoney(this.money + moneyValue);
       }
 
       if (this.snake.leftArena() || this.snake.selfCollision()) {
@@ -227,17 +254,17 @@ class Game {
 
   setMoney(money) {
     this.money = money;
-    this.moneyDisplay.textContent = money;
+    this.moneyDisplayTextElement.textContent = money;
   }
 
   setScore(score) {
     this.score = score;
-    this.scoreDisplay.textContent = score;
+    this.scoreDisplayTextElement.textContent = score;
   }
 
   setHighscore(highscore) {
     this.highscore = highscore;
-    this.highscoreDisplay.textContent = highscore;
+    this.highscoreDisplayTextElement.textContent = highscore;
   }
 
   saveGameProgressToLocalStorage(gameProgress) {
@@ -279,15 +306,33 @@ class Food {
     this.column = 10;
     this.row = 5;
     this.name = "food";
-    this.value = 1;
     this.type = type;
 
     this.appleImageElement = document.querySelector("#apple");
     this.bananaImageElement = document.querySelector("#banana");
+    this.cherryImageElement = document.querySelector("#cherry");
+    this.melonImageElement = document.querySelector("#melon");
+
+    this.setType(type);
   }
 
   setType(type) {
     this.type = type;
+
+    switch (type) {
+      case "apple":
+        this.value = 1;
+        break;
+      case "banana":
+        this.value = 2;
+        break;
+      case "cherry":
+        this.value = 5;
+        break;
+      case "melon":
+        this.value = 10;
+        break;
+    }
   }
 
   move(emptyCells) {
@@ -299,8 +344,23 @@ class Food {
   }
 
   draw() {
-    const imageToDraw =
-      this.type === "banana" ? this.bananaImageElement : this.appleImageElement;
+    let imageToDraw;
+
+    switch (this.type) {
+      case "banana":
+        imageToDraw = this.bananaImageElement;
+        break;
+      case "cherry":
+        imageToDraw = this.cherryImageElement;
+        break;
+      case "melon":
+        imageToDraw = this.melonImageElement;
+        break;
+      case "apple":
+      default:
+        imageToDraw = this.appleImageElement;
+        break;
+    }
 
     this.ctx.drawImage(
       imageToDraw,

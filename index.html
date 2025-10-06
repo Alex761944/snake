@@ -14,6 +14,8 @@
     <div class="u-Hidden">
       <img id="apple" src="/images/Apple.png" alt="apple" />
       <img id="banana" src="/images/Banana.png" alt="banana" />
+      <img id="cherry" src="/images/Cherry.png" alt="cherry" />
+      <img id="melon" src="/images/Melon.png" alt="melon" />
     </div>
 
     <div class="Scoreboard">
@@ -26,34 +28,87 @@
 
     <div class="Display">
       <canvas id="canvas" width="320" height="240"></canvas>
-      <button class="Button PurchaseButton" id="unlock-banana">
-        <span> Unlock Banana </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M20 6 9 17l-5-5" />
-        </svg>
-      </button>
+      <div class="UpgradeShop">
+        <button class="Button PurchaseButton" data-upgrade="banana">
+          <span> Unlock Banana </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        </button>
+
+        <button class="Button PurchaseButton" data-upgrade="cherry">
+          <span> Unlock Cherry </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        </button>
+
+        <button class="Button PurchaseButton" data-upgrade="melon">
+          <span> Unlock Melon </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        </button>
+
+        <button class="Button PurchaseButton" data-upgrade="second-food-chance">
+          <span> Unlock 10% chance for second Fruit </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="Interface">
       <button class="Button" id="start">Start</button>
 
-      <button class="Button" id="reset-highscore">Reset Highscore</button>
+      <button class="Button" id="reset-progress">Reset Progress</button>
 
       <button class="Button" id="stop">Stop</button>
 
       <p>Difficulty: <strong id="difficulty-text"></strong></p>
 
-      <input id="difficulty-range" type="range" min="1" max="4" value="2" />
+      <input id="difficulty-range" type="range" min="1" max="5" value="2" />
     </div>
   </body>
 </html>
