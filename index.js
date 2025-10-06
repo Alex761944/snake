@@ -6,7 +6,7 @@ const DIFFICULTY_TEXTS = {
   3: "Normal",
   2: "Advanced",
   4: "Hard",
-  5: "Nightmare",
+  5: "Veteran",
 };
 
 class Game {
