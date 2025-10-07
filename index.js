@@ -70,8 +70,15 @@ class Game {
 
     this.upgradeButtonElements.forEach((upgradeButtonElement) => {
       const upgrade = upgradeButtonElement.getAttribute("data-upgrade");
+      const upgradeCost = Number(
+        upgradeButtonElement.getAttribute("data-upgrade-cost")
+      );
 
       upgradeButtonElement.addEventListener("click", () => {
+        if (this.money < upgradeCost) return;
+
+        this.setMoney(this.money - upgradeCost);
+
         this.upgrades.push(upgrade);
 
         this.setPurchaseStyle(upgradeButtonElement);
