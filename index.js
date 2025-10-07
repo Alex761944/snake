@@ -18,7 +18,7 @@ class Game {
     this.running = false;
 
     this.snake = null;
-    this.food = null;
+    this.foods = [];
 
     this.tick = 0;
 
@@ -160,8 +160,7 @@ class Game {
     this.entities.push(this.snake);
 
     const type = this.upgrades.includes("banana") ? "banana" : "apple";
-    this.food = new Food(this.ctx, type);
-    this.entities.push(this.food);
+    this.foods.push(new Food(this.ctx, type));
 
     /* Run game loop 60 times per second */
     this.interval = setInterval(this.update.bind(this), 1000 / 60);
@@ -203,27 +202,56 @@ class Game {
     if (this.tick % (60 / this.difficultyValue) === 0) {
       this.snake.move();
 
-      const foodCollision = this.snake.foodCollision(this.food);
-      const moneyValue = this.food.value;
+      this.foods.forEach((food) => {
+        const foodCollision = this.snake.foodCollision(food);
+        const moneyValue = food.value;
 
-      if (foodCollision) {
-        if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
-          this.food.setType("cherry");
-        } else if (
-          this.upgrades.includes("banana") &&
-          this.getGambleResult(50)
-        ) {
-          this.food.setType("banana");
-        } else if (this.upgrades.includes("melon") && this.getGambleResult(5)) {
-          this.food.setType("melon");
-        } else {
-          this.food.setType("apple");
+        if (foodCollision) {
+          if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
+            food.setType("cherry");
+          } else if (
+            this.upgrades.includes("banana") &&
+            this.getGambleResult(50)
+          ) {
+            food.setType("banana");
+          } else if (
+            this.upgrades.includes("melon") &&
+            this.getGambleResult(5)
+          ) {
+            food.setType("melon");
+          } else {
+            food.setType("apple");
+          }
+
+          if (
+            this.upgrades.includes("second-food-chance") &&
+            this.getGambleResult(10)
+          ) {
+            let foodType;
+
+            if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
+              foodType = "cherry";
+            } else if (
+              this.upgrades.includes("banana") &&
+              this.getGambleResult(50)
+            ) {
+              foodType = "banana";
+            } else if (
+              this.upgrades.includes("melon") &&
+              this.getGambleResult(5)
+            ) {
+              foodType = "melon";
+            }
+
+            this.foods.push(new Food(this.ctx, foodType, this.getEmptyCells()));
+          }
+
+          /*TODO: fix bug where two foods spawn in the same cell. */
+          food.move(this.getEmptyCells());
+          this.setScore(this.score + this.difficultyValue);
+          this.setMoney(this.money + moneyValue);
         }
-
-        this.food.move(this.getEmptyCells());
-        this.setScore(this.score + this.difficultyValue);
-        this.setMoney(this.money + moneyValue);
-      }
+      });
 
       if (this.snake.leftArena() || this.snake.selfCollision()) {
         this.stop();
@@ -232,10 +260,10 @@ class Game {
 
       this.ctx.clearRect(0, 0, COLUMN_COUNT * CELL_SIZE, ROW_COUNT * CELL_SIZE);
 
-      this.entities.forEach((entity) => {
-        if (entity.draw) {
-          entity.draw();
-        }
+      this.snake.draw();
+
+      this.foods.forEach((food) => {
+        food.draw();
       });
     }
 
@@ -292,21 +320,28 @@ class Game {
     });
 
     emptyCells = emptyCells.filter((cell) => {
-      return !(this.food.column === cell.column && this.food.row === cell.row);
+      return this.foods.some((food) => {
+        return !(food.column === cell.column && food.row === cell.row);
+      });
     });
 
     return emptyCells;
   }
 }
 class Food {
-  constructor(ctx, type) {
+  constructor(ctx, type, emptyCells) {
     this.ctx = ctx;
     this.margin = 1;
     this.foodSize = CELL_SIZE - this.margin * 2;
-    this.column = 10;
-    this.row = 5;
     this.name = "food";
     this.type = type;
+
+    this.column = 10;
+    this.row = 5;
+
+    if (emptyCells) {
+      this.move(emptyCells);
+    }
 
     this.appleImageElement = document.querySelector("#apple");
     this.bananaImageElement = document.querySelector("#banana");
