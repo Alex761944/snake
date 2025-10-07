@@ -172,15 +172,15 @@ class Game {
     if (this.score > this.highscore) {
       this.highscore = this.score;
       this.highscoreDisplayTextElement.textContent = this.highscore;
-
-      const gameProgress = {
-        highscore: this.highscore,
-        money: this.money,
-        upgrades: this.upgrades,
-      };
-
-      this.saveGameProgressToLocalStorage(gameProgress);
     }
+
+    const gameProgress = {
+      highscore: this.highscore,
+      money: this.money,
+      upgrades: this.upgrades,
+    };
+
+    this.saveGameProgressToLocalStorage(gameProgress);
 
     this.difficultyInputElement.removeAttribute("disabled");
     this.startButtonElement.removeAttribute("disabled");
