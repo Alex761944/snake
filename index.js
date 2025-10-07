@@ -159,8 +159,7 @@ class Game {
     this.snake = new Snake(this.ctx);
     this.entities.push(this.snake);
 
-    const type = this.upgrades.includes("banana") ? "banana" : "apple";
-    this.foods.push(new Food(this.ctx, type));
+    this.foods.push(new Food(this.ctx, this.rollFoodType()));
 
     /* Run game loop 60 times per second */
     this.interval = setInterval(this.update.bind(this), 1000 / 60);
@@ -207,43 +206,16 @@ class Game {
         const moneyValue = food.value;
 
         if (foodCollision) {
-          if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
-            food.setType("cherry");
-          } else if (
-            this.upgrades.includes("banana") &&
-            this.getGambleResult(50)
-          ) {
-            food.setType("banana");
-          } else if (
-            this.upgrades.includes("melon") &&
-            this.getGambleResult(5)
-          ) {
-            food.setType("melon");
-          } else {
-            food.setType("apple");
-          }
+          const foodType = this.rollFoodType();
+          food.setType(foodType);
 
           if (
             this.upgrades.includes("second-food-chance") &&
             this.getGambleResult(10)
           ) {
-            let foodType;
-
-            if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
-              foodType = "cherry";
-            } else if (
-              this.upgrades.includes("banana") &&
-              this.getGambleResult(50)
-            ) {
-              foodType = "banana";
-            } else if (
-              this.upgrades.includes("melon") &&
-              this.getGambleResult(5)
-            ) {
-              foodType = "melon";
-            }
-
-            this.foods.push(new Food(this.ctx, foodType, this.getEmptyCells()));
+            this.foods.push(
+              new Food(this.ctx, this.rollFoodType(), this.getEmptyCells())
+            );
           }
 
           /*TODO: fix bug where two foods spawn in the same cell. */
@@ -308,6 +280,22 @@ class Game {
     }
 
     return JSON.parse(gameProgressString);
+  }
+
+  rollFoodType() {
+    let foodType;
+
+    if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
+      foodType = "cherry";
+    } else if (this.upgrades.includes("banana") && this.getGambleResult(50)) {
+      foodType = "banana";
+    } else if (this.upgrades.includes("melon") && this.getGambleResult(5)) {
+      foodType = "melon";
+    } else {
+      foodType = "apple";
+    }
+
+    return foodType;
   }
 
   getEmptyCells() {
