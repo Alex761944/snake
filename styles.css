@@ -8,13 +8,17 @@
   --size-l: 16px;
 
   --canvas-background: black;
-  --canvas-border: white;
+  --canvas-border: #28536b;
 
   --text-color: #b6c454;
 
-  --button-text-color: #ffe1a8;
-  --button-background-color: #407076;
-  --button-border-color: #6da34d;
+  --shop-button-text-color: #a6d49f;
+  --shop-button-background-color: #522a27;
+  --shop-button-border-color: #6da34d;
+
+  --menu-button-text-color: #ffe1a8;
+  --menu-button-background-color: #407076;
+  --menu-button-border-color: #6da34d;
 }
 
 *,
@@ -65,13 +69,20 @@ canvas {
 .UpgradeShop {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: var(--size-s);
+}
+
+.ButtonGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--size-s);
 }
 
 .Button {
   display: flex;
   justify-content: center;
-  width: 200px;
+  align-items: center;
   padding: 16px 32px;
   border-radius: 8px;
   cursor: pointer;
@@ -79,9 +90,16 @@ canvas {
   user-select: none;
   text-transform: uppercase;
   letter-spacing: 2px;
-  border: var(--button-border-color), dashed;
-  background-color: var(--button-background-color);
-  color: var(--button-text-color);
+}
+
+.Button--Shop {
+  background-color: var(--shop-button-background-color);
+  color: var(--shop-button-text-color);
+}
+
+.Button--Menu {
+  background-color: var(--menu-button-background-color);
+  color: var(--menu-button-text-color);
 }
 
 .PurchaseButton svg {
@@ -98,9 +116,14 @@ canvas {
 
 .Scoreboard {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-around;
+  width: 320px;
   gap: var(--size-s);
+}
+
+.Scoreboard__Score {
+  font-size: var(--text-body-m);
 }
 
 .Interface {

@@ -21,17 +21,21 @@
     <div class="Scoreboard">
       <p>Score: <strong id="score">0</strong></p>
 
-      <p>Highscore: <strong id="highscore">0</strong></p>
-
       <p>Money: <strong id="money">0</strong></p>
+
+      <p>Highscore: <strong id="highscore">0</strong></p>
     </div>
 
     <div class="Display">
       <canvas id="canvas" width="320" height="240"></canvas>
-      <div class="UpgradeShop">
-        <h3>Shop</h3>
+    </div>
+
+    <div class="UpgradeShop">
+      <h3>Shop</h3>
+
+      <div class="ButtonGroup">
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="banana"
           data-upgrade-cost="100"
         >
@@ -52,7 +56,7 @@
         </button>
 
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="cherry"
           data-upgrade-cost="500"
         >
@@ -73,7 +77,7 @@
         </button>
 
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="melon"
           data-upgrade-cost="1000"
         >
@@ -94,11 +98,11 @@
         </button>
 
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="second-food-chance"
           data-upgrade-cost="1000"
         >
-          <span> 10% chance for 2x Fruit - $1000 </span>
+          <span> 10% Chance 2x Fruit - $1000 </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -117,11 +121,17 @@
     </div>
 
     <div class="Interface">
-      <button class="Button" id="start">Start</button>
+      <h3>Menu</h3>
 
-      <button class="Button" id="reset-progress">Reset Progress</button>
+      <div class="ButtonGroup">
+        <button class="Button Button--Menu" id="start">Start</button>
 
-      <button class="Button" id="stop">Stop</button>
+        <button class="Button Button--Menu" id="reset-progress">
+          Reset Progress
+        </button>
+
+        <button class="Button Button--Menu" id="stop">Stop</button>
+      </div>
 
       <p>Difficulty: <strong id="difficulty-text"></strong></p>
 
