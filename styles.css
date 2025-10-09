@@ -6,6 +6,7 @@
   --size-s: 4px;
   --size-m: 8px;
   --size-l: 16px;
+  --size-xl: 32px;
 
   --canvas-background: black;
   --canvas-border: #28536b;
@@ -19,6 +20,11 @@
   --menu-button-text-color: #ffe1a8;
   --menu-button-background-color: #407076;
   --menu-button-border-color: #6da34d;
+
+  /* Custom range slider */
+
+  --track-height: 12px;
+  --thumb-size: 25px;
 }
 
 *,
@@ -57,6 +63,54 @@ canvas {
   border: 4px solid var(--canvas-border);
   width: calc(var(--column-count) * var(--cell-size));
   height: calc(var(--row-count) * var(--cell-size));
+}
+
+.Text--Large {
+  font-size: 1.5rem;
+}
+
+.DifficultySlider {
+  margin-top: 10px;
+  width: 80%;
+  position: relative;
+}
+
+input[type="range"] {
+  /* Hide default input */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  position: relative;
+
+  width: 100%;
+}
+
+/* Track styling */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: var(--track-height);
+  background: rgb(252, 194, 87);
+  border-radius: 10px;
+}
+
+/* Thumb styling */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  background: orange;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: calc((var(--thumb-size) - var(--track-height)) / -2);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover and focus effects */
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
 }
 
 .Display {
@@ -115,15 +169,16 @@ canvas {
 }
 
 .Scoreboard {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 320px;
-  gap: var(--size-s);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: flex-end;
+  gap: var(--size-xl);
 }
 
-.Scoreboard__Score {
-  font-size: var(--text-body-m);
+.Scoreboard__Item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .Interface {

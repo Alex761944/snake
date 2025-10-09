@@ -19,11 +19,20 @@
     </div>
 
     <div class="Scoreboard">
-      <p>Score: <strong id="score">0</strong></p>
+      <div class="Scoreboard__Item">
+        <p>Money</p>
+        <strong id="money">0</strong>
+      </div>
 
-      <p>Money: <strong id="money">0</strong></p>
+      <div class="Scoreboard__Item">
+        <p class="Text--Large">Score</p>
+        <strong id="score" class="Text--Large">0</strong>
+      </div>
 
-      <p>Highscore: <strong id="highscore">0</strong></p>
+      <div class="Scoreboard__Item">
+        <p>Highscore</p>
+        <strong id="highscore">0</strong>
+      </div>
     </div>
 
     <div class="Display">
@@ -124,18 +133,27 @@
       <h3>Menu</h3>
 
       <div class="ButtonGroup">
-        <button class="Button Button--Menu" id="start">Start</button>
+        <button id="start" class="Button Button--Menu">Start</button>
 
-        <button class="Button Button--Menu" id="reset-progress">
+        <button id="reset-progress" class="Button Button--Menu">
           Reset Progress
         </button>
 
-        <button class="Button Button--Menu" id="stop">Stop</button>
+        <button id="stop" class="Button Button--Menu">Stop</button>
       </div>
 
       <p>Difficulty: <strong id="difficulty-text"></strong></p>
 
-      <input id="difficulty-range" type="range" min="1" max="5" value="2" />
+      <div class="DifficultySlider">
+        <input
+          id="difficulty-range"
+          class="DifficultyInput"
+          type="range"
+          min="1"
+          max="5"
+          value="2"
+        />
+      </div>
     </div>
   </body>
 </html>
