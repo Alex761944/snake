@@ -6,15 +6,25 @@
   --size-s: 4px;
   --size-m: 8px;
   --size-l: 16px;
+  --size-xl: 32px;
 
   --canvas-background: black;
-  --canvas-border: white;
+  --canvas-border: #28536b;
 
   --text-color: #b6c454;
 
-  --button-text-color: #ffe1a8;
-  --button-background-color: #407076;
-  --button-border-color: #6da34d;
+  --shop-button-text-color: #a6d49f;
+  --shop-button-background-color: #522a27;
+  --shop-button-border-color: #6da34d;
+
+  --menu-button-text-color: #ffe1a8;
+  --menu-button-background-color: #407076;
+  --menu-button-border-color: #6da34d;
+
+  /* Custom range slider */
+
+  --track-height: 12px;
+  --thumb-size: 25px;
 }
 
 *,
@@ -55,6 +65,54 @@ canvas {
   height: calc(var(--row-count) * var(--cell-size));
 }
 
+.Text--Large {
+  font-size: 1.5rem;
+}
+
+.DifficultySlider {
+  margin-top: 10px;
+  width: 80%;
+  position: relative;
+}
+
+input[type="range"] {
+  /* Hide default input */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  position: relative;
+
+  width: 100%;
+}
+
+/* Track styling */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: var(--track-height);
+  background: rgb(252, 194, 87);
+  border-radius: 10px;
+}
+
+/* Thumb styling */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  background: orange;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: calc((var(--thumb-size) - var(--track-height)) / -2);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover and focus effects */
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
 .Display {
   display: flex;
   align-items: flex-start;
@@ -65,13 +123,20 @@ canvas {
 .UpgradeShop {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: var(--size-s);
+}
+
+.ButtonGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--size-s);
 }
 
 .Button {
   display: flex;
   justify-content: center;
-  width: 200px;
+  align-items: center;
   padding: 16px 32px;
   border-radius: 8px;
   cursor: pointer;
@@ -79,9 +144,16 @@ canvas {
   user-select: none;
   text-transform: uppercase;
   letter-spacing: 2px;
-  border: var(--button-border-color), dashed;
-  background-color: var(--button-background-color);
-  color: var(--button-text-color);
+}
+
+.Button--Shop {
+  background-color: var(--shop-button-background-color);
+  color: var(--shop-button-text-color);
+}
+
+.Button--Menu {
+  background-color: var(--menu-button-background-color);
+  color: var(--menu-button-text-color);
 }
 
 .PurchaseButton svg {
@@ -97,10 +169,16 @@ canvas {
 }
 
 .Scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: flex-end;
+  gap: var(--size-xl);
+}
+
+.Scoreboard__Item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--size-s);
 }
 
 .Interface {

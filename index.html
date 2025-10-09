@@ -19,19 +19,32 @@
     </div>
 
     <div class="Scoreboard">
-      <p>Score: <strong id="score">0</strong></p>
+      <div class="Scoreboard__Item">
+        <p>Money</p>
+        <strong id="money">0</strong>
+      </div>
 
-      <p>Highscore: <strong id="highscore">0</strong></p>
+      <div class="Scoreboard__Item">
+        <p class="Text--Large">Score</p>
+        <strong id="score" class="Text--Large">0</strong>
+      </div>
 
-      <p>Money: <strong id="money">0</strong></p>
+      <div class="Scoreboard__Item">
+        <p>Highscore</p>
+        <strong id="highscore">0</strong>
+      </div>
     </div>
 
     <div class="Display">
       <canvas id="canvas" width="320" height="240"></canvas>
-      <div class="UpgradeShop">
-        <h3>Shop</h3>
+    </div>
+
+    <div class="UpgradeShop">
+      <h3>Shop</h3>
+
+      <div class="ButtonGroup">
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="banana"
           data-upgrade-cost="100"
         >
@@ -52,7 +65,7 @@
         </button>
 
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="cherry"
           data-upgrade-cost="500"
         >
@@ -73,7 +86,7 @@
         </button>
 
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="melon"
           data-upgrade-cost="1000"
         >
@@ -94,11 +107,11 @@
         </button>
 
         <button
-          class="Button PurchaseButton"
+          class="Button Button--Shop PurchaseButton"
           data-upgrade="second-food-chance"
           data-upgrade-cost="1000"
         >
-          <span> 10% chance for 2x Fruit - $1000 </span>
+          <span> 10% Chance 2x Fruit - $1000 </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -117,15 +130,30 @@
     </div>
 
     <div class="Interface">
-      <button class="Button" id="start">Start</button>
+      <h3>Menu</h3>
 
-      <button class="Button" id="reset-progress">Reset Progress</button>
+      <div class="ButtonGroup">
+        <button id="start" class="Button Button--Menu">Start</button>
 
-      <button class="Button" id="stop">Stop</button>
+        <button id="reset-progress" class="Button Button--Menu">
+          Reset Progress
+        </button>
+
+        <button id="stop" class="Button Button--Menu">Stop</button>
+      </div>
 
       <p>Difficulty: <strong id="difficulty-text"></strong></p>
 
-      <input id="difficulty-range" type="range" min="1" max="5" value="2" />
+      <div class="DifficultySlider">
+        <input
+          id="difficulty-range"
+          class="DifficultyInput"
+          type="range"
+          min="1"
+          max="5"
+          value="2"
+        />
+      </div>
     </div>
   </body>
 </html>
