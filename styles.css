@@ -13,8 +13,8 @@
 
   --text-color: #b6c454;
 
-  --shop-button-text-color: #a6d49f;
-  --shop-button-background-color: #522a27;
+  --shop-button-text-color: #bf0603;
+  --shop-button-background-color: #f7b538;
   --shop-button-border-color: #6da34d;
 
   --menu-button-text-color: #ffe1a8;
@@ -145,6 +145,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
   align-items: center;
   padding: 16px 32px;
   border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
   font-size: small;
   user-select: none;
