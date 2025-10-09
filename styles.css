@@ -1,5 +1,5 @@
 :root {
-  --cell-size: 16px;
+  --cell-size: 32px;
   --column-count: 20;
   --row-count: 15;
 
@@ -128,8 +128,14 @@ input[type="range"]:hover::-webkit-slider-thumb {
 }
 
 .ButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-s);
+}
+
+.GridGroup {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: var(--size-s);
 }
 

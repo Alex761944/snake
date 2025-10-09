@@ -1,4 +1,4 @@
-const CELL_SIZE = 16;
+const CELL_SIZE = 32;
 const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
 const DIFFICULTY_TEXTS = {
