@@ -21,6 +21,7 @@ class Game {
     this.foods = [];
 
     this.tick = 0;
+    this.consumeSound = new Audio("sound-files/food-collision.mp3");
 
     this.difficultyInputElement = document.querySelector("#difficulty-range");
     this.scoreDisplayTextElement = document.querySelector("#score");
@@ -229,6 +230,8 @@ class Game {
           food.move(this.getEmptyCells());
           this.setScore(this.score + this.difficultyValue);
           this.setMoney(this.money + moneyValue);
+
+          this.consumeSound.play();
         }
       });
 

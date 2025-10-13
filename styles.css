@@ -11,14 +11,14 @@
   --canvas-background: black;
   --canvas-border: #28536b;
 
-  --text-color: #b6c454;
+  --text-color: #f3752b;
+  --button-text-color: #bf0603;
 
-  --shop-button-text-color: #bf0603;
   --shop-button-background-color: #f7b538;
   --shop-button-border-color: #6da34d;
 
   --menu-button-text-color: #ffe1a8;
-  --menu-button-background-color: #407076;
+  --menu-button-background-color: #f79d5c;
   --menu-button-border-color: #6da34d;
 
   /* Custom range slider */
@@ -155,12 +155,12 @@ input[type="range"]:hover::-webkit-slider-thumb {
 
 .Button--Shop {
   background-color: var(--shop-button-background-color);
-  color: var(--shop-button-text-color);
+  color: var(--button-text-color);
 }
 
 .Button--Menu {
   background-color: var(--menu-button-background-color);
-  color: var(--menu-button-text-color);
+  color: var(--button-text-color);
 }
 
 .PurchaseButton svg {
