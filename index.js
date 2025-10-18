@@ -330,17 +330,18 @@ class Game {
   }
 
   drawGameOver() {
-    const ctx = this.canvasElement.getContext("2d");
-    const { width, height } = this.canvasElement;
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    this.ctx.fillRect(0, 0, CELL_SIZE * COLUMN_COUNT, CELL_SIZE * ROW_COUNT);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.font = "bold 36px Arial";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("GAME OVER", width / 2, height / 2);
+    this.ctx.font = "bold 36px Arial";
+    this.ctx.fillStyle = "white";
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillText(
+      "GAME OVER",
+      (CELL_SIZE * COLUMN_COUNT) / 2,
+      (CELL_SIZE * ROW_COUNT) / 2
+    );
   }
 }
 class Food {
