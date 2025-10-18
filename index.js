@@ -22,6 +22,7 @@ class Game {
 
     this.tick = 0;
     this.consumeSound = new Audio("sound-files/food-collision.mp3");
+    this.gameOverSound = new Audio("sound-files/game-over.mp3");
 
     this.difficultyInputElement = document.querySelector("#difficulty-range");
     this.scoreDisplayTextElement = document.querySelector("#score");
@@ -195,6 +196,7 @@ class Game {
     this.startButtonElement.textContent = "New Game";
 
     clearInterval(this.interval);
+    this.gameOverSound.play();
     this.drawGameOver();
   }
 
