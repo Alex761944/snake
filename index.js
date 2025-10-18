@@ -267,7 +267,7 @@ class Game {
 
   setMoney(money) {
     this.money = money;
-    this.moneyDisplayTextElement.textContent = money;
+    this.moneyDisplayTextElement.textContent = `$${money}`;
   }
 
   setScore(score) {
