@@ -96,6 +96,8 @@ class Game {
 
       if (this.upgrades.includes(upgrade)) {
         this.setPurchaseStyle(upgradeButtonElement);
+      } else if (this.money < upgradeCost) {
+        this.setDisabledStyle(upgradeButtonElement);
       }
     });
 
@@ -234,6 +236,8 @@ class Game {
           this.setScore(this.score + this.difficultyValue);
           this.setMoney(this.money + moneyValue);
 
+          this.checkUpgradeAffordability();
+
           this.consumeSound.play();
         }
       });
@@ -259,6 +263,27 @@ class Game {
     buttonElement.disabled = "disabled";
 
     buttonElement.classList.add("PurchaseButton--Purchased");
+  }
+
+  setDisabledStyle(buttonElement) {
+    buttonElement.disabled = "disabled";
+  }
+
+  removeDisabledStyle(buttonElement) {
+    buttonElement.removeAttribute("disabled");
+  }
+
+  checkUpgradeAffordability() {
+    this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+      const upgrade = upgradeButtonElement.getAttribute("data-upgrade");
+      const upgradeCost = Number(
+        upgradeButtonElement.getAttribute("data-upgrade-cost")
+      );
+
+      if (this.money >= upgradeCost && !this.upgrades.includes(upgrade)) {
+        this.removeDisabledStyle(upgradeButtonElement);
+      }
+    });
   }
 
   setUpgrades(upgrades) {
