@@ -69,9 +69,9 @@ canvas {
   font-size: 1.5rem;
 }
 
-.DifficultySlider {
+.Slider {
   margin-top: 10px;
-  width: 80%;
+  width: 100%;
   position: relative;
 }
 
@@ -175,6 +175,14 @@ input[type="range"]:hover::-webkit-slider-thumb {
   opacity: 0.5;
 }
 
+#mute-toggle[data-is-muted="false"] svg:last-child {
+  display: none;
+}
+
+#mute-toggle[data-is-muted="true"] svg:first-child {
+  display: none;
+}
+
 .Scoreboard {
   display: grid;
   width: 640px;
@@ -193,5 +201,5 @@ input[type="range"]:hover::-webkit-slider-thumb {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--size-s);
+  gap: var(--size-m);
 }

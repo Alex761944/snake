@@ -22,10 +22,20 @@ class Game {
     this.foods = [];
 
     this.tick = 0;
-    this.consumeSound = new Audio("sound-files/food-collision.mp3");
-    this.gameOverSound = new Audio("sound-files/game-over.mp3");
+
+    this.sounds = [
+      {
+        name: "eat",
+        audio: new Audio("sound-files/food-collision.mp3"),
+      },
+      {
+        name: "game-over",
+        audio: new Audio("sound-files/game-over.mp3"),
+      },
+    ];
 
     this.difficultyInputElement = document.querySelector("#difficulty-range");
+    this.volumeInputElement = document.querySelector("#volume-range");
     this.scoreDisplayTextElement = document.querySelector("#score");
     this.highscoreDisplayTextElement = document.querySelector("#highscore");
     this.moneyDisplayTextElement = document.querySelector("#money");
@@ -33,10 +43,13 @@ class Game {
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
     this.difficultyTextElement = document.querySelector("#difficulty-text");
+    this.volumeTextElement = document.querySelector("#volume-text");
     this.resetProgressElement = document.querySelector("#reset-progress");
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
+    this.muteButtonElement = document.querySelector("#mute-toggle");
 
     this.score = 0;
+    this.volume = 0.5;
 
     const { highscore, money, upgrades } =
       this.loadGameProgressFromLocalStorage();
@@ -44,6 +57,20 @@ class Game {
     this.setHighscore(highscore);
     this.setMoney(money);
     this.setUpgrades(upgrades);
+
+    const volumeString = localStorage.getItem("volume") || "50";
+    this.volume = Number(volumeString) / 100;
+    this.setVolume();
+    this.volumeInputElement.value = volumeString;
+    this.volumeTextElement.textContent = volumeString;
+
+    this.volumeInputElement.addEventListener("input", () => {
+      this.volume = Number(this.volumeInputElement.value) / 100;
+      this.setVolume();
+      this.volumeTextElement.textContent = this.volumeInputElement.value;
+
+      localStorage.setItem("volume", this.volumeInputElement.value);
+    });
 
     const difficultyString = localStorage.getItem("difficulty") || "2";
     this.difficultyInputElement.value = difficultyString;
@@ -58,6 +85,16 @@ class Game {
         DIFFICULTY_TEXTS[this.difficultyValue];
 
       localStorage.setItem("difficulty", this.difficultyInputElement.value);
+    });
+
+    this.muteButtonElement.addEventListener("click", () => {
+      const currentMuteState =
+        this.muteButtonElement.getAttribute("data-is-muted");
+      if (currentMuteState === "false") {
+        this.muteButtonElement.setAttribute("data-is-muted", "true");
+      } else {
+        this.muteButtonElement.setAttribute("data-is-muted", "false");
+      }
     });
 
     this.ctx = this.canvasElement.getContext("2d");
@@ -92,9 +129,6 @@ class Game {
           upgrades: this.upgrades,
         };
 
-        /* check if the upgrade we just click is the max-difficulty upgrade */
-        /* if so run the unlockMaxDifficulty() */
-
         if (upgrade === "max-difficulty") {
           this.unlockMaxDifficulty();
         }
@@ -104,6 +138,10 @@ class Game {
 
       if (this.upgrades.includes(upgrade)) {
         this.setPurchaseStyle(upgradeButtonElement);
+
+        if (upgrade === "max-difficulty") {
+          this.unlockMaxDifficulty();
+        }
       } else if (this.money < upgradeCost) {
         this.setDisabledStyle(upgradeButtonElement);
       }
@@ -206,7 +244,7 @@ class Game {
     this.startButtonElement.textContent = "New Game";
 
     clearInterval(this.interval);
-    this.gameOverSound.play();
+    this.playSound("game-over");
     this.drawGameOver();
   }
 
@@ -251,7 +289,7 @@ class Game {
 
           this.checkUpgradeAffordability();
 
-          this.consumeSound.play();
+          this.playSound("eat");
         }
       });
 
@@ -305,6 +343,20 @@ class Game {
     this.difficultyValue = 6;
     this.difficultyTextElement.textContent =
       DIFFICULTY_TEXTS[this.difficultyValue];
+  }
+
+  playSound(name) {
+    this.sounds
+      .find((sound) => {
+        return sound.name === name;
+      })
+      .audio.play();
+  }
+
+  setVolume() {
+    this.sounds.forEach((sound) => {
+      sound.audio.volume = this.volume;
+    });
   }
 
   setUpgrades(upgrades) {
