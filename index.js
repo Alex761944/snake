@@ -48,6 +48,10 @@ class Game {
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
     this.muteButtonElement = document.querySelector("#mute-toggle");
 
+    const storedMuteState = localStorage.getItem("is-muted") === "true";
+    this.isMuted = storedMuteState;
+    this.muteButtonElement.setAttribute("data-is-muted", String(this.isMuted));
+
     this.score = 0;
     this.volume = 0.5;
 
@@ -89,12 +93,17 @@ class Game {
 
     this.muteButtonElement.addEventListener("click", () => {
       const currentMuteState =
-        this.muteButtonElement.getAttribute("data-is-muted");
-      if (currentMuteState === "false") {
-        this.muteButtonElement.setAttribute("data-is-muted", "true");
-      } else {
-        this.muteButtonElement.setAttribute("data-is-muted", "false");
-      }
+        this.muteButtonElement.getAttribute("data-is-muted") === "true";
+      const newMuteState = !currentMuteState;
+
+      this.muteButtonElement.setAttribute(
+        "data-is-muted",
+        String(newMuteState)
+      );
+
+      localStorage.setItem("is-muted", String(newMuteState));
+
+      this.isMuted = newMuteState;
     });
 
     this.ctx = this.canvasElement.getContext("2d");
@@ -346,11 +355,13 @@ class Game {
   }
 
   playSound(name) {
-    this.sounds
-      .find((sound) => {
-        return sound.name === name;
-      })
-      .audio.play();
+    if (this.isMuted) return;
+
+    const sound = this.sounds.find((sound) => sound.name === name);
+    if (!sound) return;
+
+    sound.audio.currentTime = 0;
+    sound.audio.play();
   }
 
   setVolume() {
