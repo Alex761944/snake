@@ -175,6 +175,14 @@ input[type="range"]:hover::-webkit-slider-thumb {
   opacity: 0.5;
 }
 
+#mute-toggle[data-is-muted="false"] svg:last-child {
+  display: none;
+}
+
+#mute-toggle[data-is-muted="true"] svg:first-child {
+  display: none;
+}
+
 .Scoreboard {
   display: grid;
   width: 640px;
