@@ -163,16 +163,24 @@
         <button id="stop" class="Button Button--Menu">Stop</button>
       </div>
 
+      <h3>Settings</h3>
+
       <p>Difficulty: <strong id="difficulty-text"></strong></p>
 
-      <div class="DifficultySlider">
+      <div class="Slider">
+        <input id="difficulty-range" type="range" min="1" max="5" value="2" />
+      </div>
+
+      <p>Volume: <strong id="volume-number">50</strong></p>
+
+      <div class="Slider">
         <input
-          id="difficulty-range"
-          class="DifficultyInput"
+          id="volume-range"
           type="range"
           min="1"
-          max="5"
-          value="2"
+          max="100"
+          step="1"
+          value="50"
         />
       </div>
     </div>
