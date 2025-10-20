@@ -104,9 +104,6 @@ class Game {
 
       if (this.upgrades.includes(upgrade)) {
         this.setPurchaseStyle(upgradeButtonElement);
-        if (upgrade === "max-difficulty") {
-          this.unlockMaxDifficulty();
-        }
       } else if (this.money < upgradeCost) {
         this.setDisabledStyle(upgradeButtonElement);
       }
