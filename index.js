@@ -26,6 +26,7 @@ class Game {
     this.gameOverSound = new Audio("sound-files/game-over.mp3");
 
     this.difficultyInputElement = document.querySelector("#difficulty-range");
+    this.volumeInputElement = document.querySelector("#volume-range");
     this.scoreDisplayTextElement = document.querySelector("#score");
     this.highscoreDisplayTextElement = document.querySelector("#highscore");
     this.moneyDisplayTextElement = document.querySelector("#money");
@@ -33,6 +34,7 @@ class Game {
     this.startButtonElement = document.querySelector("#start");
     this.stopButtonElement = document.querySelector("#stop");
     this.difficultyTextElement = document.querySelector("#difficulty-text");
+    this.volumeTextElement = document.querySelector("#volume-text");
     this.resetProgressElement = document.querySelector("#reset-progress");
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
 
@@ -44,6 +46,17 @@ class Game {
     this.setHighscore(highscore);
     this.setMoney(money);
     this.setUpgrades(upgrades);
+
+    const volumeString = localStorage.getItem("volume") || "50";
+    this.volumeInputElement.value = volumeString;
+    this.volumeTextElement.textContent = volumeString;
+
+    this.volumeInputElement.addEventListener("input", () => {
+      this.volumeValue = this.volumeInputElement.value;
+      this.volumeTextElement.textContent = this.volumeValue;
+
+      localStorage.setItem("volume", this.volumeInputElement.value);
+    });
 
     const difficultyString = localStorage.getItem("difficulty") || "2";
     this.difficultyInputElement.value = difficultyString;
