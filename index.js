@@ -3,10 +3,11 @@ const COLUMN_COUNT = 20;
 const ROW_COUNT = 15;
 const DIFFICULTY_TEXTS = {
   1: "Easy",
-  3: "Normal",
   2: "Advanced",
+  3: "Normal",
   4: "Hard",
   5: "Veteran",
+  6: "Nightmare",
 };
 
 class Game {
@@ -47,17 +48,6 @@ class Game {
     const difficultyString = localStorage.getItem("difficulty") || "2";
     this.difficultyInputElement.value = difficultyString;
 
-    this.ctx = this.canvasElement.getContext("2d");
-
-    this.entities = [];
-    this.cells = [];
-
-    for (let column = 0; column < COLUMN_COUNT; column++) {
-      for (let row = 0; row < ROW_COUNT; row++) {
-        this.cells.push({ column, row });
-      }
-    }
-
     this.difficultyValue = Number(this.difficultyInputElement?.value);
     this.difficultyTextElement.textContent =
       DIFFICULTY_TEXTS[this.difficultyValue];
@@ -69,6 +59,17 @@ class Game {
 
       localStorage.setItem("difficulty", this.difficultyInputElement.value);
     });
+
+    this.ctx = this.canvasElement.getContext("2d");
+
+    this.entities = [];
+    this.cells = [];
+
+    for (let column = 0; column < COLUMN_COUNT; column++) {
+      for (let row = 0; row < ROW_COUNT; row++) {
+        this.cells.push({ column, row });
+      }
+    }
 
     this.upgradeButtonElements.forEach((upgradeButtonElement) => {
       const upgrade = upgradeButtonElement.getAttribute("data-upgrade");
@@ -91,11 +92,21 @@ class Game {
           upgrades: this.upgrades,
         };
 
+        /* check if the upgrade we just click is the max-difficulty upgrade */
+        /* if so run the unlockMaxDifficulty() */
+
+        if (upgrade === "max-difficulty") {
+          this.unlockMaxDifficulty();
+        }
+
         this.saveGameProgressToLocalStorage(gameProgress);
       });
 
       if (this.upgrades.includes(upgrade)) {
         this.setPurchaseStyle(upgradeButtonElement);
+        if (upgrade === "max-difficulty") {
+          this.unlockMaxDifficulty();
+        }
       } else if (this.money < upgradeCost) {
         this.setDisabledStyle(upgradeButtonElement);
       }
@@ -234,7 +245,12 @@ class Game {
           /*TODO: fix bug where two foods spawn in the same cell. */
           food.move(this.getEmptyCells());
           this.setScore(this.score + this.difficultyValue);
-          this.setMoney(this.money + moneyValue);
+
+          if (this.difficultyValue === 6) {
+            this.setMoney(this.money + moneyValue * 2);
+          } else {
+            this.setMoney(this.money + moneyValue);
+          }
 
           this.checkUpgradeAffordability();
 
@@ -284,6 +300,14 @@ class Game {
         this.removeDisabledStyle(upgradeButtonElement);
       }
     });
+  }
+
+  unlockMaxDifficulty() {
+    this.difficultyInputElement.max = 6;
+    this.difficultyInputElement.value = 6;
+    this.difficultyValue = 6;
+    this.difficultyTextElement.textContent =
+      DIFFICULTY_TEXTS[this.difficultyValue];
   }
 
   setUpgrades(upgrades) {
