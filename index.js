@@ -21,6 +21,19 @@ class Game {
     this.snake = null;
     this.foods = [];
 
+    this.saveState = {
+      settings: {
+        difficulty: 2,
+        volume: 0.5,
+        isMuted: false,
+      },
+      progress: {
+        highscore: 0,
+        money: 0,
+        upgrades: [],
+      },
+    };
+
     this.tick = 0;
 
     this.sounds = [
@@ -134,6 +147,8 @@ class Game {
           upgrades: this.upgrades,
         };
 
+        this.saveState.progress.upgrades.push(upgrade);
+
         if (upgrade === "max-difficulty") {
           this.unlockMaxDifficulty();
         }
@@ -165,6 +180,10 @@ class Game {
       this.setMoney(0);
 
       const gameProgress = { highscore: 0, money: this.money, upgrades: [] };
+
+      this.saveState.progress.highscore = 0;
+      this.saveState.progress.money = 0;
+      this.saveState.progress.upgrades = [];
 
       this.upgradeButtonElements.forEach((upgradeButtonElement) => {
         upgradeButtonElement.removeAttribute("disabled");
@@ -224,6 +243,12 @@ class Game {
     if (this.score > this.highscore) {
       this.highscore = this.score;
       this.highscoreDisplayTextElement.textContent = this.highscore;
+    }
+
+    if (this.score > this.saveState.progress.highscore) {
+      this.saveState.progress.highscore = this.score;
+      this.highscoreDisplayTextElement.textContent =
+        this.saveState.progress.highscore;
     }
 
     const gameProgress = {
@@ -361,6 +386,7 @@ class Game {
 
   setMoney(money) {
     this.money = money;
+    this.saveState.progress.money = money;
     this.moneyDisplayTextElement.textContent = `$${money}`;
   }
 
@@ -377,14 +403,20 @@ class Game {
   saveGameProgressToLocalStorage(gameProgress) {
     /* highscore, money, upgrades */
     localStorage.setItem("game-progress", JSON.stringify(gameProgress));
+    localStorage.setItem("save-state", JSON.stringify(this.saveState));
   }
 
   loadGameProgressFromLocalStorage() {
     const gameProgressString = localStorage.getItem("game-progress");
+    const saveStateString = localStorage.getItem("save-state");
 
     if (!gameProgressString) {
       return { highscore: 0, money: 0, upgrades: [] };
     }
+
+    if (!saveStateString) return;
+
+    this.saveState = JSON.parse(saveStateString);
 
     return JSON.parse(gameProgressString);
   }
