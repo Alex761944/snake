@@ -105,7 +105,6 @@ class Game {
 
     this.ctx = this.canvasElement.getContext("2d");
 
-    this.entities = [];
     this.cells = [];
 
     for (let column = 0; column < COLUMN_COUNT; column++) {
@@ -176,51 +175,44 @@ class Game {
     });
 
     window.addEventListener("keydown", ({ key }) => {
-      if (!this.entities) return;
-
-      const snake = this.entities.find((entity) => entity.name === "snake");
-      if (!snake) return;
-
       if (
         (key === "ArrowUp" || key === "w") &&
-        snake.direction !== "up" &&
-        snake.direction !== "down"
+        this.snake.direction !== "up" &&
+        this.snake.direction !== "down"
       ) {
-        snake.desiredDirection = "up";
+        this.snake.desiredDirection = "up";
       } else if (
         (key === "ArrowDown" || key === "s") &&
-        snake.direction !== "up" &&
-        snake.direction !== "down"
+        this.snake.direction !== "up" &&
+        this.snake.direction !== "down"
       ) {
-        snake.desiredDirection = "down";
+        this.snake.desiredDirection = "down";
       } else if (
         (key === "ArrowLeft" || key === "a") &&
-        snake.direction !== "left" &&
-        snake.direction !== "right"
+        this.snake.direction !== "left" &&
+        this.snake.direction !== "right"
       ) {
-        snake.desiredDirection = "left";
+        this.snake.desiredDirection = "left";
       } else if (
         (key === "ArrowRight" || key === "d") &&
-        snake.direction !== "left" &&
-        snake.direction !== "right"
+        this.snake.direction !== "left" &&
+        this.snake.direction !== "right"
       ) {
-        snake.desiredDirection = "right";
+        this.snake.desiredDirection = "right";
       }
     });
   }
 
   start() {
-    console.log("start");
-
     /* Reset all entities and score if a game was already running */
     this.setScore(0);
-    this.entities = [];
 
     this.startButtonElement.disabled = "disabled";
     this.difficultyInputElement.disabled = "disabled";
 
     this.snake = new Snake(this.ctx);
-    this.entities.push(this.snake);
+
+    this.foods = [];
 
     this.foods.push(new Food(this.ctx, this.rollFoodType()));
 
@@ -229,8 +221,6 @@ class Game {
   }
 
   stop() {
-    console.log("stop");
-
     if (this.score > this.highscore) {
       this.highscore = this.score;
       this.highscoreDisplayTextElement.textContent = this.highscore;
@@ -260,8 +250,6 @@ class Game {
   }
 
   update() {
-    console.log("update");
-
     /* Things that should happen every X frames. X depends on the difficulty */
     if (this.tick % (60 / this.difficultyValue) === 0) {
       this.snake.move();
@@ -638,8 +626,6 @@ class Snake {
     lastSegment.connectionLeft =
       lastSegment.row === secondLastSegment.row &&
       lastSegment.column > secondLastSegment.column;
-
-    console.log(lastSegment);
   }
 
   leftArena() {
