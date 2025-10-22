@@ -50,7 +50,7 @@ class Game {
 
     const storedMuteState = localStorage.getItem("is-muted") === "true";
     this.isMuted = storedMuteState;
-    this.muteButtonElement.setAttribute("data-is-muted", String(this.isMuted));
+    this.muteButtonElement.setAttribute("data-is-muted", this.isMuted);
 
     this.score = 0;
     this.volume = 0.5;
@@ -96,12 +96,9 @@ class Game {
         this.muteButtonElement.getAttribute("data-is-muted") === "true";
       const newMuteState = !currentMuteState;
 
-      this.muteButtonElement.setAttribute(
-        "data-is-muted",
-        String(newMuteState)
-      );
+      this.muteButtonElement.setAttribute("data-is-muted", newMuteState);
 
-      localStorage.setItem("is-muted", String(newMuteState));
+      localStorage.setItem("is-muted", newMuteState);
 
       this.isMuted = newMuteState;
     });
