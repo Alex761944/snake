@@ -61,7 +61,9 @@ class Game {
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
     this.muteButtonElement = document.querySelector("#mute-toggle");
 
-    const storedMuteState = localStorage.getItem("is-muted") === "true";
+    const storedMuteState =
+      JSON.parse(localStorage.getItem("save-state")).settings.isMuted ===
+      "true";
     this.isMuted = storedMuteState;
     this.muteButtonElement.setAttribute("data-is-muted", this.isMuted);
 
@@ -75,21 +77,24 @@ class Game {
     this.setMoney(money);
     this.setUpgrades(upgrades);
 
-    const volumeString = localStorage.getItem("volume") || "50";
-    this.volume = Number(volumeString) / 100;
+    const volumeString =
+      JSON.parse(localStorage.getItem("save-state")).settings.volume || "50";
+    this.volume = Number(volumeString) * 100;
     this.setVolume();
-    this.volumeInputElement.value = volumeString;
-    this.volumeTextElement.textContent = volumeString;
+    this.volumeInputElement.value = volumeString * 100;
+    this.volumeTextElement.textContent = volumeString * 100;
 
     this.volumeInputElement.addEventListener("input", () => {
-      this.volume = Number(this.volumeInputElement.value) / 100;
+      this.volume = Number(this.volumeInputElement.value);
       this.setVolume();
       this.volumeTextElement.textContent = this.volumeInputElement.value;
 
-      localStorage.setItem("volume", this.volumeInputElement.value);
+      this.saveState.settings.volume = this.volumeInputElement.value / 100;
+      localStorage.setItem("save-state", JSON.stringify(this.saveState));
     });
 
-    const difficultyString = localStorage.getItem("difficulty") || "2";
+    const difficultyString =
+      JSON.parse(localStorage.getItem("save-state")).settings.difficulty || "2";
     this.difficultyInputElement.value = difficultyString;
 
     this.difficultyValue = Number(this.difficultyInputElement?.value);
@@ -101,7 +106,8 @@ class Game {
       this.difficultyTextElement.textContent =
         DIFFICULTY_TEXTS[this.difficultyValue];
 
-      localStorage.setItem("difficulty", this.difficultyInputElement.value);
+      this.saveState.settings.difficulty = this.difficultyInputElement.value;
+      localStorage.setItem("save-state", JSON.stringify(this.saveState));
     });
 
     this.muteButtonElement.addEventListener("click", () => {
@@ -109,11 +115,17 @@ class Game {
         this.muteButtonElement.getAttribute("data-is-muted") === "true";
       const newMuteState = !currentMuteState;
 
-      this.muteButtonElement.setAttribute("data-is-muted", newMuteState);
-
-      localStorage.setItem("is-muted", newMuteState);
-
+      this.muteButtonElement.setAttribute(
+        "data-is-muted",
+        String(newMuteState)
+      );
       this.isMuted = newMuteState;
+
+      const saveState = JSON.parse(localStorage.getItem("save-state") || "{}");
+      saveState.settings = saveState.settings || {};
+      saveState.settings.isMuted = newMuteState;
+
+      localStorage.setItem("save-state", JSON.stringify(saveState));
     });
 
     this.ctx = this.canvasElement.getContext("2d");
@@ -376,7 +388,7 @@ class Game {
 
   setVolume() {
     this.sounds.forEach((sound) => {
-      sound.audio.volume = this.volume;
+      sound.audio.volume = this.volume / 100;
     });
   }
 
