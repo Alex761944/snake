@@ -121,8 +121,8 @@ class Game {
       );
       this.isMuted = newMuteState;
 
-      const saveState = JSON.parse(localStorage.getItem("save-state") || "{}");
-      saveState.settings = saveState.settings || {};
+      const saveState = JSON.parse(localStorage.getItem("save-state"));
+      saveState.settings = saveState.settings;
       saveState.settings.isMuted = newMuteState;
 
       localStorage.setItem("save-state", JSON.stringify(saveState));
