@@ -113,6 +113,16 @@ input[type="range"]:hover::-webkit-slider-thumb {
   transform: scale(1.2);
 }
 
+input[type="range"]:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+  transform: none;
+  cursor: default;
+}
+
 .Display {
   display: flex;
   align-items: flex-start;
