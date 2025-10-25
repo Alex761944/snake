@@ -16,12 +16,25 @@ class Game {
     this.columnCount = COLUMN_COUNT;
     this.rowCount = ROW_COUNT;
     this.interval = null;
-    this.running = false;
 
     this.snake = null;
     this.foods = [];
 
+    this.score = 0;
     this.tick = 0;
+
+    this.saveState = {
+      settings: {
+        difficulty: 2,
+        volume: 0.5,
+        isMuted: false,
+      },
+      progress: {
+        highscore: 0,
+        money: 0,
+        upgrades: [],
+      },
+    };
 
     this.sounds = [
       {
@@ -48,59 +61,51 @@ class Game {
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
     this.muteButtonElement = document.querySelector("#mute-toggle");
 
-    const storedMuteState = localStorage.getItem("is-muted") === "true";
-    this.isMuted = storedMuteState;
-    this.muteButtonElement.setAttribute("data-is-muted", this.isMuted);
+    this.loadGameProgressFromLocalStorage();
 
-    this.score = 0;
-    this.volume = 0.5;
+    this.updateHighscoreText();
+    this.updateMoneyText();
 
-    const { highscore, money, upgrades } =
-      this.loadGameProgressFromLocalStorage();
+    this.muteButtonElement.setAttribute(
+      "data-is-muted",
+      this.saveState.settings.isMuted
+    );
 
-    this.setHighscore(highscore);
-    this.setMoney(money);
-    this.setUpgrades(upgrades);
-
-    const volumeString = localStorage.getItem("volume") || "50";
-    this.volume = Number(volumeString) / 100;
     this.setVolume();
-    this.volumeInputElement.value = volumeString;
-    this.volumeTextElement.textContent = volumeString;
+
+    this.volumeInputElement.value = this.saveState.settings.volume * 100;
+    this.volumeTextElement.textContent = this.saveState.settings.volume * 100;
 
     this.volumeInputElement.addEventListener("input", () => {
-      this.volume = Number(this.volumeInputElement.value) / 100;
-      this.setVolume();
+      this.saveState.settings.volume = this.volumeInputElement.value / 100;
       this.volumeTextElement.textContent = this.volumeInputElement.value;
 
-      localStorage.setItem("volume", this.volumeInputElement.value);
+      this.setVolume();
+      this.saveGameProgressToLocalStorage();
     });
 
-    const difficultyString = localStorage.getItem("difficulty") || "2";
-    this.difficultyInputElement.value = difficultyString;
-
-    this.difficultyValue = Number(this.difficultyInputElement?.value);
+    this.difficultyInputElement.value = this.saveState.settings.difficulty;
     this.difficultyTextElement.textContent =
-      DIFFICULTY_TEXTS[this.difficultyValue];
+      DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
 
     this.difficultyInputElement.addEventListener("input", () => {
-      this.difficultyValue = Number(this.difficultyInputElement.value);
+      this.saveState.settings.difficulty = Number(
+        this.difficultyInputElement.value
+      );
       this.difficultyTextElement.textContent =
-        DIFFICULTY_TEXTS[this.difficultyValue];
+        DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
 
-      localStorage.setItem("difficulty", this.difficultyInputElement.value);
+      this.saveGameProgressToLocalStorage();
     });
 
     this.muteButtonElement.addEventListener("click", () => {
-      const currentMuteState =
-        this.muteButtonElement.getAttribute("data-is-muted") === "true";
-      const newMuteState = !currentMuteState;
+      this.saveState.settings.isMuted = !this.saveState.settings.isMuted;
+      this.muteButtonElement.setAttribute(
+        "data-is-muted",
+        this.saveState.settings.isMuted
+      );
 
-      this.muteButtonElement.setAttribute("data-is-muted", newMuteState);
-
-      localStorage.setItem("is-muted", newMuteState);
-
-      this.isMuted = newMuteState;
+      this.saveGameProgressToLocalStorage();
     });
 
     this.ctx = this.canvasElement.getContext("2d");
@@ -120,34 +125,28 @@ class Game {
       );
 
       upgradeButtonElement.addEventListener("click", () => {
-        if (this.money < upgradeCost) return;
+        if (this.saveState.progress.money < upgradeCost) return;
 
-        this.setMoney(this.money - upgradeCost);
-
-        this.upgrades.push(upgrade);
+        this.updateMoneyText(this.saveState.progress.money - upgradeCost);
 
         this.setPurchaseStyle(upgradeButtonElement);
 
-        const gameProgress = {
-          highscore: this.highscore,
-          money: this.money,
-          upgrades: this.upgrades,
-        };
+        this.saveState.progress.upgrades.push(upgrade);
 
         if (upgrade === "max-difficulty") {
           this.unlockMaxDifficulty();
         }
 
-        this.saveGameProgressToLocalStorage(gameProgress);
+        this.saveGameProgressToLocalStorage();
       });
 
-      if (this.upgrades.includes(upgrade)) {
+      if (this.saveState.progress.upgrades.includes(upgrade)) {
         this.setPurchaseStyle(upgradeButtonElement);
 
         if (upgrade === "max-difficulty") {
           this.unlockMaxDifficulty();
         }
-      } else if (this.money < upgradeCost) {
+      } else if (this.saveState.progress.money < upgradeCost) {
         this.setDisabledStyle(upgradeButtonElement);
       }
     });
@@ -161,17 +160,19 @@ class Game {
     });
 
     this.resetProgressElement.addEventListener("click", () => {
-      this.setHighscore(0);
-      this.setMoney(0);
+      this.updateHighscoreText(0);
+      this.updateMoneyText(0);
 
-      const gameProgress = { highscore: 0, money: this.money, upgrades: [] };
+      this.saveState.progress.highscore = 0;
+      this.saveState.progress.money = 0;
+      this.saveState.progress.upgrades = [];
 
       this.upgradeButtonElements.forEach((upgradeButtonElement) => {
         upgradeButtonElement.removeAttribute("disabled");
         upgradeButtonElement.classList.remove("PurchaseButton--Purchased");
       });
 
-      this.saveGameProgressToLocalStorage(gameProgress);
+      this.saveGameProgressToLocalStorage();
     });
 
     window.addEventListener("keydown", ({ key }) => {
@@ -221,18 +222,14 @@ class Game {
   }
 
   stop() {
-    if (this.score > this.highscore) {
-      this.highscore = this.score;
-      this.highscoreDisplayTextElement.textContent = this.highscore;
+    console.log(this.score, this.saveState.progress.highscore);
+    if (this.score > this.saveState.progress.highscore) {
+      this.saveState.progress.highscore = this.score;
+      this.highscoreDisplayTextElement.textContent =
+        this.saveState.progress.highscore;
     }
 
-    const gameProgress = {
-      highscore: this.highscore,
-      money: this.money,
-      upgrades: this.upgrades,
-    };
-
-    this.saveGameProgressToLocalStorage(gameProgress);
+    this.saveGameProgressToLocalStorage();
 
     this.difficultyInputElement.removeAttribute("disabled");
     this.startButtonElement.removeAttribute("disabled");
@@ -251,7 +248,7 @@ class Game {
 
   update() {
     /* Things that should happen every X frames. X depends on the difficulty */
-    if (this.tick % (60 / this.difficultyValue) === 0) {
+    if (this.tick % (60 / this.saveState.settings.difficulty) === 0) {
       this.snake.move();
 
       this.foods.forEach((food) => {
@@ -263,7 +260,7 @@ class Game {
           food.setType(foodType);
 
           if (
-            this.upgrades.includes("second-food-chance") &&
+            this.saveState.progress.upgrades.includes("second-food-chance") &&
             this.getGambleResult(10)
           ) {
             this.foods.push(
@@ -271,14 +268,17 @@ class Game {
             );
           }
 
-          /*TODO: fix bug where two foods spawn in the same cell. */
           food.move(this.getEmptyCells());
-          this.setScore(this.score + this.difficultyValue);
+          this.setScore(this.score + this.saveState.settings.difficulty);
 
-          if (this.difficultyValue === 6) {
-            this.setMoney(this.money + moneyValue * 2);
+          if (this.saveState.settings.difficulty === 6) {
+            this.saveState.progress.money =
+              this.saveState.progress.money + moneyValue * 2;
+            this.updateMoneyText();
           } else {
-            this.setMoney(this.money + moneyValue);
+            this.saveState.progress.money =
+              this.saveState.progress.money + moneyValue;
+            this.updateMoneyText();
           }
 
           this.checkUpgradeAffordability();
@@ -325,7 +325,10 @@ class Game {
         upgradeButtonElement.getAttribute("data-upgrade-cost")
       );
 
-      if (this.money >= upgradeCost && !this.upgrades.includes(upgrade)) {
+      if (
+        this.saveState.progress.money >= upgradeCost &&
+        !this.saveState.progress.upgrades.includes(upgrade)
+      ) {
         this.removeDisabledStyle(upgradeButtonElement);
       }
     });
@@ -334,13 +337,13 @@ class Game {
   unlockMaxDifficulty() {
     this.difficultyInputElement.max = 6;
     this.difficultyInputElement.value = 6;
-    this.difficultyValue = 6;
+    this.saveState.settings.difficulty = 6;
     this.difficultyTextElement.textContent =
-      DIFFICULTY_TEXTS[this.difficultyValue];
+      DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
   }
 
   playSound(name) {
-    if (this.isMuted) return;
+    if (this.saveState.settings.isMuted) return;
 
     const sound = this.sounds.find((sound) => sound.name === name);
     if (!sound) return;
@@ -351,17 +354,12 @@ class Game {
 
   setVolume() {
     this.sounds.forEach((sound) => {
-      sound.audio.volume = this.volume;
+      sound.audio.volume = this.saveState.settings.volume;
     });
   }
 
-  setUpgrades(upgrades) {
-    this.upgrades = upgrades;
-  }
-
-  setMoney(money) {
-    this.money = money;
-    this.moneyDisplayTextElement.textContent = `$${money}`;
+  updateMoneyText() {
+    this.moneyDisplayTextElement.textContent = `$${this.saveState.progress.money}`;
   }
 
   setScore(score) {
@@ -369,34 +367,40 @@ class Game {
     this.scoreDisplayTextElement.textContent = score;
   }
 
-  setHighscore(highscore) {
-    this.highscore = highscore;
-    this.highscoreDisplayTextElement.textContent = highscore;
+  updateHighscoreText() {
+    this.highscoreDisplayTextElement.textContent =
+      this.saveState.progress.highscore;
   }
 
-  saveGameProgressToLocalStorage(gameProgress) {
-    /* highscore, money, upgrades */
-    localStorage.setItem("game-progress", JSON.stringify(gameProgress));
+  saveGameProgressToLocalStorage() {
+    localStorage.setItem("save-state", JSON.stringify(this.saveState));
   }
 
   loadGameProgressFromLocalStorage() {
-    const gameProgressString = localStorage.getItem("game-progress");
+    const saveStateString = localStorage.getItem("save-state");
 
-    if (!gameProgressString) {
-      return { highscore: 0, money: 0, upgrades: [] };
-    }
+    if (!saveStateString) return;
 
-    return JSON.parse(gameProgressString);
+    this.saveState = JSON.parse(saveStateString);
   }
 
   rollFoodType() {
     let foodType;
 
-    if (this.upgrades.includes("cherry") && this.getGambleResult(10)) {
+    if (
+      this.saveState.progress.upgrades.includes("cherry") &&
+      this.getGambleResult(10)
+    ) {
       foodType = "cherry";
-    } else if (this.upgrades.includes("banana") && this.getGambleResult(50)) {
+    } else if (
+      this.saveState.progress.upgrades.includes("banana") &&
+      this.getGambleResult(50)
+    ) {
       foodType = "banana";
-    } else if (this.upgrades.includes("melon") && this.getGambleResult(5)) {
+    } else if (
+      this.saveState.progress.upgrades.includes("melon") &&
+      this.getGambleResult(5)
+    ) {
       foodType = "melon";
     } else {
       foodType = "apple";
