@@ -268,7 +268,6 @@ class Game {
             );
           }
 
-          /*TODO: fix bug where two foods spawn in the same cell. */
           food.move(this.getEmptyCells());
           this.setScore(this.score + this.saveState.settings.difficulty);
 
