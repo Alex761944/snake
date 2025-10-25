@@ -272,11 +272,13 @@ class Game {
           this.setScore(this.score + this.saveState.settings.difficulty);
 
           if (this.saveState.settings.difficulty === 6) {
-            this.updateMoneyText(
-              this.saveState.progress.money + moneyValue * 2
-            );
+            this.saveState.progress.money =
+              this.saveState.progress.money + moneyValue * 2;
+            this.updateMoneyText();
           } else {
-            this.updateMoneyText(this.saveState.progress.money + moneyValue);
+            this.saveState.progress.money =
+              this.saveState.progress.money + moneyValue;
+            this.updateMoneyText();
           }
 
           this.checkUpgradeAffordability();
