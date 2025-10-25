@@ -60,6 +60,12 @@ class Game {
     this.resetProgressElement = document.querySelector("#reset-progress");
     this.upgradeButtonElements = document.querySelectorAll(".PurchaseButton");
     this.muteButtonElement = document.querySelector("#mute-toggle");
+    this.modalTriggerElements = document.querySelectorAll(
+      "[data-modal-trigger]"
+    );
+    this.modalCloseButtonElements = document.querySelectorAll(
+      ".Modal [data-action='close']"
+    );
 
     this.loadGameProgressFromLocalStorage();
 
@@ -201,6 +207,35 @@ class Game {
       ) {
         this.snake.desiredDirection = "right";
       }
+    });
+
+    /* Move all event listeners in this method */
+    this.setEventListeners();
+  }
+
+  setEventListeners() {
+    this.modalTriggerElements.forEach((modalTriggerElement) => {
+      modalTriggerElement.addEventListener("click", () => {
+        const modalName =
+          modalTriggerElement.getAttribute("data-modal-trigger");
+        const connectedModalElement = document.querySelector(
+          `[data-modal="${modalName}"]`
+        );
+
+        if (!connectedModalElement) return;
+
+        connectedModalElement.showModal();
+      });
+    });
+
+    this.modalCloseButtonElements.forEach((modalCloseButtonElement) => {
+      modalCloseButtonElement.addEventListener("click", () => {
+        const connectedModalElement = modalCloseButtonElement.closest(".Modal");
+
+        if (!connectedModalElement) return;
+
+        connectedModalElement.close();
+      });
     });
   }
 
