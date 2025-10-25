@@ -82,14 +82,6 @@ class Game {
     this.volumeInputElement.value = this.saveState.settings.volume * 100;
     this.volumeTextElement.textContent = this.saveState.settings.volume * 100;
 
-    this.volumeInputElement.addEventListener("input", () => {
-      this.saveState.settings.volume = this.volumeInputElement.value / 100;
-      this.volumeTextElement.textContent = this.volumeInputElement.value;
-
-      this.setVolume();
-      this.saveGameProgressToLocalStorage();
-    });
-
     this.difficultyInputElement.value = this.saveState.settings.difficulty;
     this.difficultyTextElement.textContent =
       DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
@@ -214,6 +206,7 @@ class Game {
   }
 
   setEventListeners() {
+    // Handles clicks on modal triggers. Opens the connected modal.
     this.modalTriggerElements.forEach((modalTriggerElement) => {
       modalTriggerElement.addEventListener("click", () => {
         const modalName =
@@ -228,6 +221,7 @@ class Game {
       });
     });
 
+    // Handles click on all close buttons. Closes the closest modal.
     this.modalCloseButtonElements.forEach((modalCloseButtonElement) => {
       modalCloseButtonElement.addEventListener("click", () => {
         const connectedModalElement = modalCloseButtonElement.closest(".Modal");
@@ -236,6 +230,15 @@ class Game {
 
         connectedModalElement.close();
       });
+    });
+
+    // Handles input event for the volume range.
+    this.volumeInputElement.addEventListener("input", () => {
+      this.saveState.settings.volume = this.volumeInputElement.value / 100;
+      this.volumeTextElement.textContent = this.volumeInputElement.value;
+
+      this.setVolume();
+      this.saveGameProgressToLocalStorage();
     });
   }
 
@@ -339,6 +342,11 @@ class Game {
     this.tick = this.tick + 1;
   }
 
+  /**
+   * Disables the button element and sets the purchased style.
+   *
+   * @param {HTMLButtonElement} buttonElement
+   */
   setPurchaseStyle(buttonElement) {
     buttonElement.disabled = "disabled";
 
@@ -417,8 +425,14 @@ class Game {
     if (!saveStateString) return;
 
     this.saveState = JSON.parse(saveStateString);
+    this.rollFoodType();
   }
 
+  /**
+   * Returns a random food type depending on the roll chance and unlock conditions.
+   *
+   * @returns {'apple'|'banana'|'cherry'|'melon'} Food type
+   */
   rollFoodType() {
     let foodType;
 
