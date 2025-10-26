@@ -175,6 +175,14 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 }
 
 .Button--Icon {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: var(--size-s);
+}
+
+.Modal .Button--Icon {
+  color: black;
 }
 
 .Modal {
@@ -182,6 +190,13 @@ input[type="range"]:disabled::-webkit-slider-thumb {
   width: 90%;
   max-width: 400px;
   border-radius: var(--border-radius-m);
+}
+
+.Modal__Content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--size-m);
 }
 
 .Modal__Close {
@@ -216,10 +231,17 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 
 .Scoreboard {
   display: grid;
+  position: relative;
   width: 640px;
   grid-template-columns: repeat(3, 1fr);
   align-items: flex-end;
   gap: var(--size-xl);
+}
+
+.Scoreboard__Settings {
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
 .Scoreboard__Item {
