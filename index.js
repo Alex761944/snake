@@ -118,6 +118,16 @@ class Game {
   }
 
   setEventListeners() {
+    // Starts the game.
+    this.startButtonElement.addEventListener("click", () => {
+      this.start();
+    });
+
+    // Stops the game.
+    this.stopButtonElement.addEventListener("click", () => {
+      this.stop();
+    });
+
     // Handles clicks on modal triggers. Opens the connected modal.
     this.modalTriggerElements.forEach((modalTriggerElement) => {
       modalTriggerElement.addEventListener("click", () => {
@@ -219,16 +229,6 @@ class Game {
       }
 
       this.saveGameProgressToLocalStorage();
-    });
-
-    // Starts the game.
-    this.startButtonElement.addEventListener("click", () => {
-      this.start();
-    });
-
-    // Stops the game.
-    this.stopButtonElement.addEventListener("click", () => {
-      this.stop();
     });
 
     // Resets all player progress, clears upgrades, and saves the new game state.
