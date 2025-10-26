@@ -181,15 +181,23 @@ input[type="range"]:disabled::-webkit-slider-thumb {
   padding: var(--size-s);
 }
 
-.Modal .Button--Icon {
-  color: black;
-}
-
 .Modal {
   position: relative;
+  background: #b8af7f;
+  background: linear-gradient(
+    90deg,
+    rgba(184, 175, 127, 1) 45%,
+    rgba(171, 65, 41, 1) 100%,
+    rgba(214, 207, 144, 1) 56%
+  );
   width: 90%;
   max-width: 400px;
   border-radius: var(--border-radius-m);
+  border: 1px solid white;
+}
+
+.Modal .Button--Icon {
+  color: black;
 }
 
 .Modal__Content {
