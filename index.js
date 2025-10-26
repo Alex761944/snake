@@ -86,26 +86,6 @@ class Game {
     this.difficultyTextElement.textContent =
       DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
 
-    this.difficultyInputElement.addEventListener("input", () => {
-      this.saveState.settings.difficulty = Number(
-        this.difficultyInputElement.value
-      );
-      this.difficultyTextElement.textContent =
-        DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
-
-      this.saveGameProgressToLocalStorage();
-    });
-
-    this.muteButtonElement.addEventListener("click", () => {
-      this.saveState.settings.isMuted = !this.saveState.settings.isMuted;
-      this.muteButtonElement.setAttribute(
-        "data-is-muted",
-        this.saveState.settings.isMuted
-      );
-
-      this.saveGameProgressToLocalStorage();
-    });
-
     this.ctx = this.canvasElement.getContext("2d");
 
     this.cells = [];
@@ -122,22 +102,6 @@ class Game {
         upgradeButtonElement.getAttribute("data-upgrade-cost")
       );
 
-      upgradeButtonElement.addEventListener("click", () => {
-        if (this.saveState.progress.money < upgradeCost) return;
-
-        this.updateMoneyText(this.saveState.progress.money - upgradeCost);
-
-        this.setPurchaseStyle(upgradeButtonElement);
-
-        this.saveState.progress.upgrades.push(upgrade);
-
-        if (upgrade === "max-difficulty") {
-          this.unlockMaxDifficulty();
-        }
-
-        this.saveGameProgressToLocalStorage();
-      });
-
       if (this.saveState.progress.upgrades.includes(upgrade)) {
         this.setPurchaseStyle(upgradeButtonElement);
 
@@ -146,58 +110,6 @@ class Game {
         }
       } else if (this.saveState.progress.money < upgradeCost) {
         this.setDisabledStyle(upgradeButtonElement);
-      }
-    });
-
-    this.startButtonElement.addEventListener("click", () => {
-      this.start();
-    });
-
-    this.stopButtonElement.addEventListener("click", () => {
-      this.stop();
-    });
-
-    this.resetProgressElement.addEventListener("click", () => {
-      this.updateHighscoreText(0);
-      this.updateMoneyText(0);
-
-      this.saveState.progress.highscore = 0;
-      this.saveState.progress.money = 0;
-      this.saveState.progress.upgrades = [];
-
-      this.upgradeButtonElements.forEach((upgradeButtonElement) => {
-        upgradeButtonElement.removeAttribute("disabled");
-        upgradeButtonElement.classList.remove("PurchaseButton--Purchased");
-      });
-
-      this.saveGameProgressToLocalStorage();
-    });
-
-    window.addEventListener("keydown", ({ key }) => {
-      if (
-        (key === "ArrowUp" || key === "w") &&
-        this.snake.direction !== "up" &&
-        this.snake.direction !== "down"
-      ) {
-        this.snake.desiredDirection = "up";
-      } else if (
-        (key === "ArrowDown" || key === "s") &&
-        this.snake.direction !== "up" &&
-        this.snake.direction !== "down"
-      ) {
-        this.snake.desiredDirection = "down";
-      } else if (
-        (key === "ArrowLeft" || key === "a") &&
-        this.snake.direction !== "left" &&
-        this.snake.direction !== "right"
-      ) {
-        this.snake.desiredDirection = "left";
-      } else if (
-        (key === "ArrowRight" || key === "d") &&
-        this.snake.direction !== "left" &&
-        this.snake.direction !== "right"
-      ) {
-        this.snake.desiredDirection = "right";
       }
     });
 
@@ -238,6 +150,101 @@ class Game {
       this.volumeTextElement.textContent = this.volumeInputElement.value;
 
       this.setVolume();
+      this.saveGameProgressToLocalStorage();
+    });
+
+    // Handles input event for the difficulty range.
+    this.difficultyInputElement.addEventListener("input", () => {
+      this.saveState.settings.difficulty = Number(
+        this.difficultyInputElement.value
+      );
+      this.difficultyTextElement.textContent =
+        DIFFICULTY_TEXTS[this.saveState.settings.difficulty];
+
+      this.saveGameProgressToLocalStorage();
+    });
+
+    // Handles the mute toggle.
+    this.muteButtonElement.addEventListener("click", () => {
+      this.saveState.settings.isMuted = !this.saveState.settings.isMuted;
+      this.muteButtonElement.setAttribute(
+        "data-is-muted",
+        this.saveState.settings.isMuted
+      );
+
+      this.saveGameProgressToLocalStorage();
+    });
+
+    // Handles keyboard input for snake control.
+    window.addEventListener("keydown", ({ key }) => {
+      if (
+        (key === "ArrowUp" || key === "w") &&
+        this.snake.direction !== "up" &&
+        this.snake.direction !== "down"
+      ) {
+        this.snake.desiredDirection = "up";
+      } else if (
+        (key === "ArrowDown" || key === "s") &&
+        this.snake.direction !== "up" &&
+        this.snake.direction !== "down"
+      ) {
+        this.snake.desiredDirection = "down";
+      } else if (
+        (key === "ArrowLeft" || key === "a") &&
+        this.snake.direction !== "left" &&
+        this.snake.direction !== "right"
+      ) {
+        this.snake.desiredDirection = "left";
+      } else if (
+        (key === "ArrowRight" || key === "d") &&
+        this.snake.direction !== "left" &&
+        this.snake.direction !== "right"
+      ) {
+        this.snake.desiredDirection = "right";
+      }
+    });
+
+    // Handles the upgrade costs and purchases.
+    upgradeButtonElement.addEventListener("click", () => {
+      if (this.saveState.progress.money < upgradeCost) return;
+
+      this.updateMoneyText(this.saveState.progress.money - upgradeCost);
+
+      this.setPurchaseStyle(upgradeButtonElement);
+
+      this.saveState.progress.upgrades.push(upgrade);
+
+      if (upgrade === "max-difficulty") {
+        this.unlockMaxDifficulty();
+      }
+
+      this.saveGameProgressToLocalStorage();
+    });
+
+    // Starts the game.
+    this.startButtonElement.addEventListener("click", () => {
+      this.start();
+    });
+
+    // Stops the game.
+    this.stopButtonElement.addEventListener("click", () => {
+      this.stop();
+    });
+
+    // Resets all player progress, clears upgrades, and saves the new game state.
+    this.resetProgressElement.addEventListener("click", () => {
+      this.updateHighscoreText(0);
+      this.updateMoneyText(0);
+
+      this.saveState.progress.highscore = 0;
+      this.saveState.progress.money = 0;
+      this.saveState.progress.upgrades = [];
+
+      this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+        upgradeButtonElement.removeAttribute("disabled");
+        upgradeButtonElement.classList.remove("PurchaseButton--Purchased");
+      });
+
       this.saveGameProgressToLocalStorage();
     });
   }
