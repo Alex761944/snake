@@ -182,11 +182,10 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 }
 
 .Modal {
-  position: relative;
-  background: #b8af7f;
+  background: #ebc713;
   background: linear-gradient(
     90deg,
-    rgba(184, 175, 127, 1) 45%,
+    rgba(235, 199, 19, 1) 45%,
     rgba(171, 65, 41, 1) 100%,
     rgba(214, 207, 144, 1) 56%
   );
