@@ -62,7 +62,7 @@ p {
 
 canvas {
   background-color: var(--canvas-background);
-  border: 4px solid var(--canvas-border);
+  border: 4px solid #f7b538;
   width: calc(var(--column-count) * var(--cell-size));
   height: calc(var(--row-count) * var(--cell-size));
 }
@@ -177,14 +177,14 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 .Button--Icon {
   background: transparent;
   border: none;
-  color: white;
+  color: #f79d5c;
   padding: var(--size-s);
 }
 
 .Modal {
   background: #ebc713;
   background: linear-gradient(
-    90deg,
+    20deg,
     rgba(235, 199, 19, 1) 45%,
     rgba(171, 65, 41, 1) 100%,
     rgba(214, 207, 144, 1) 56%
