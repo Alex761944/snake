@@ -215,20 +215,25 @@ class Game {
     });
 
     // Handles the upgrade costs and purchases.
-    upgradeButtonElement.addEventListener("click", () => {
-      if (this.saveState.progress.money < upgradeCost) return;
+    this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+      const upgrade = upgradeButtonElement.getAttribute("data-upgrade");
+      const upgradeCost =
+        upgradeButtonElement.getAttribute("data-upgrade-cost");
 
-      this.updateMoneyText(this.saveState.progress.money - upgradeCost);
+      upgradeButtonElement.addEventListener("click", () => {
+        if (this.saveState.progress.money < upgradeCost) return;
 
-      this.setPurchaseStyle(upgradeButtonElement);
+        this.updateMoneyText(this.saveState.progress.money - upgradeCost);
+        this.setPurchaseStyle(upgradeButtonElement);
 
-      this.saveState.progress.upgrades.push(upgrade);
+        this.saveState.progress.upgrades.push(upgrade);
 
-      if (upgrade === "max-difficulty") {
-        this.unlockMaxDifficulty();
-      }
+        if (upgrade === "max-difficulty") {
+          this.unlockMaxDifficulty();
+        }
 
-      this.saveGameProgressToLocalStorage();
+        this.saveGameProgressToLocalStorage();
+      });
     });
 
     // Resets all player progress, clears upgrades, and saves the new game state.
@@ -332,7 +337,15 @@ class Game {
         }
       });
 
-      if (this.snake.leftArena() || this.snake.selfCollision()) {
+      const hitWall = this.snake.leftArena();
+      const hitSelf = this.snake.selfCollision();
+
+      if (
+        hitWall &&
+        this.saveState.progress.upgrades.includes("portal-walls")
+      ) {
+        this.snake.portalWall();
+      } else if (hitWall || hitSelf) {
         this.stop();
         return;
       }
@@ -704,6 +717,22 @@ class Snake {
     return body.some(
       (bodyCell) => bodyCell.column === head.column && bodyCell.row === head.row
     );
+  }
+
+  portalWall() {
+    const head = this.body[0];
+
+    if (head.column < 0) {
+      head.column = COLUMN_COUNT - 1;
+    } else if (head.column >= COLUMN_COUNT) {
+      head.column = 0;
+    }
+
+    if (head.row < 0) {
+      head.row = ROW_COUNT - 1;
+    } else if (head.row >= ROW_COUNT) {
+      head.row = 0;
+    }
   }
 
   foodCollision(food) {
