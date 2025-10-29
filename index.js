@@ -299,7 +299,9 @@ class Game {
   update() {
     /* Things that should happen every X frames. X depends on the difficulty */
     if (this.tick % (60 / this.saveState.settings.difficulty) === 0) {
-      this.snake.move();
+      this.snake.move(
+        this.saveState.progress.upgrades.includes("portal-walls")
+      );
 
       this.foods.forEach((food) => {
         const foodCollision = this.snake.foodCollision(food);
@@ -341,11 +343,10 @@ class Game {
       const hitSelf = this.snake.selfCollision();
 
       if (
-        hitWall &&
-        this.saveState.progress.upgrades.includes("portal-walls")
+        (hitWall &&
+          !this.saveState.progress.upgrades.includes("portal-walls")) ||
+        hitSelf
       ) {
-        this.snake.portalWall();
-      } else if (hitWall || hitSelf) {
         this.stop();
         return;
       }
@@ -622,7 +623,7 @@ class Snake {
     this.direction = newDirection;
   }
 
-  move() {
+  move(portalWalls) {
     const head = this.body[0];
     const newHead = { column: head.column, row: head.row };
 
@@ -655,7 +656,12 @@ class Snake {
 
     /* Move in direction */
     if (this.direction === "right") {
-      newHead.column += 1;
+      if (portalWalls && newHead.column >= COLUMN_COUNT - 1) {
+        newHead.column = 0;
+      } else {
+        newHead.column += 1;
+      }
+
       newHead.connectionLeft = true;
       this.body[0].connectionRight = true;
     } else if (this.direction === "up") {
@@ -667,7 +673,12 @@ class Snake {
       newHead.connectionTop = true;
       this.body[0].connectionBottom = true;
     } else if (this.direction === "left") {
-      newHead.column -= 1;
+      if (portalWalls && newHead.column <= 0) {
+        newHead.column = COLUMN_COUNT - 1;
+      } else {
+        newHead.column -= 1;
+      }
+
       newHead.connectionRight = true;
       this.body[0].connectionLeft = true;
     }
@@ -690,7 +701,8 @@ class Snake {
 
     lastSegment.connectionRight =
       lastSegment.row === secondLastSegment.row &&
-      lastSegment.column < secondLastSegment.column;
+      (lastSegment.column + 1 === secondLastSegment.column ||
+        lastSegment.column - COLUMN_COUNT + 1 === secondLastSegment.column);
 
     lastSegment.connectionBottom =
       lastSegment.row < secondLastSegment.row &&
@@ -698,7 +710,10 @@ class Snake {
 
     lastSegment.connectionLeft =
       lastSegment.row === secondLastSegment.row &&
-      lastSegment.column > secondLastSegment.column;
+      (lastSegment.column === secondLastSegment.column + 1 ||
+        lastSegment.column - COLUMN_COUNT - 1 === secondLastSegment.column ||
+        (lastSegment.column === 0 &&
+          secondLastSegment.column === COLUMN_COUNT - 1));
   }
 
   leftArena() {
@@ -717,22 +732,6 @@ class Snake {
     return body.some(
       (bodyCell) => bodyCell.column === head.column && bodyCell.row === head.row
     );
-  }
-
-  portalWall() {
-    const head = this.body[0];
-
-    if (head.column < 0) {
-      head.column = COLUMN_COUNT - 1;
-    } else if (head.column >= COLUMN_COUNT) {
-      head.column = 0;
-    }
-
-    if (head.row < 0) {
-      head.row = ROW_COUNT - 1;
-    } else if (head.row >= ROW_COUNT) {
-      head.row = 0;
-    }
   }
 
   foodCollision(food) {
