@@ -665,10 +665,16 @@ class Snake {
       newHead.connectionLeft = true;
       this.body[0].connectionRight = true;
     } else if (this.direction === "up") {
+      if (portalWalls && newHead.row <= 0) {
+        newHead.row = ROW_COUNT;
+      }
       newHead.row -= 1;
       newHead.connectionBottom = true;
       this.body[0].connectionTop = true;
     } else if (this.direction === "down") {
+      if (portalWalls && newHead.row >= ROW_COUNT - 1) {
+        newHead.row = -1;
+      }
       newHead.row += 1;
       newHead.connectionTop = true;
       this.body[0].connectionBottom = true;
@@ -696,8 +702,9 @@ class Snake {
     const secondLastSegment = this.body[this.body.length - 2];
 
     lastSegment.connectionTop =
-      lastSegment.row > secondLastSegment.row &&
-      lastSegment.column === secondLastSegment.column;
+      lastSegment.column === secondLastSegment.column &&
+      (lastSegment.row - 1 === secondLastSegment.row ||
+        (lastSegment.row === 0 && secondLastSegment.row === ROW_COUNT - 1));
 
     lastSegment.connectionRight =
       lastSegment.row === secondLastSegment.row &&
@@ -705,8 +712,9 @@ class Snake {
         lastSegment.column - COLUMN_COUNT + 1 === secondLastSegment.column);
 
     lastSegment.connectionBottom =
-      lastSegment.row < secondLastSegment.row &&
-      lastSegment.column === secondLastSegment.column;
+      lastSegment.column === secondLastSegment.column &&
+      (lastSegment.row + 1 === secondLastSegment.row ||
+        lastSegment.row - ROW_COUNT + 1 === secondLastSegment.row);
 
     lastSegment.connectionLeft =
       lastSegment.row === secondLastSegment.row &&
