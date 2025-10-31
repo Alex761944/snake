@@ -215,20 +215,25 @@ class Game {
     });
 
     // Handles the upgrade costs and purchases.
-    upgradeButtonElement.addEventListener("click", () => {
-      if (this.saveState.progress.money < upgradeCost) return;
+    this.upgradeButtonElements.forEach((upgradeButtonElement) => {
+      const upgrade = upgradeButtonElement.getAttribute("data-upgrade");
+      const upgradeCost =
+        upgradeButtonElement.getAttribute("data-upgrade-cost");
 
-      this.updateMoneyText(this.saveState.progress.money - upgradeCost);
+      upgradeButtonElement.addEventListener("click", () => {
+        if (this.saveState.progress.money < upgradeCost) return;
 
-      this.setPurchaseStyle(upgradeButtonElement);
+        this.updateMoneyText(this.saveState.progress.money - upgradeCost);
+        this.setPurchaseStyle(upgradeButtonElement);
 
-      this.saveState.progress.upgrades.push(upgrade);
+        this.saveState.progress.upgrades.push(upgrade);
 
-      if (upgrade === "max-difficulty") {
-        this.unlockMaxDifficulty();
-      }
+        if (upgrade === "max-difficulty") {
+          this.unlockMaxDifficulty();
+        }
 
-      this.saveGameProgressToLocalStorage();
+        this.saveGameProgressToLocalStorage();
+      });
     });
 
     // Resets all player progress, clears upgrades, and saves the new game state.
@@ -294,7 +299,9 @@ class Game {
   update() {
     /* Things that should happen every X frames. X depends on the difficulty */
     if (this.tick % (60 / this.saveState.settings.difficulty) === 0) {
-      this.snake.move();
+      this.snake.move(
+        this.saveState.progress.upgrades.includes("portal-walls")
+      );
 
       this.foods.forEach((food) => {
         const foodCollision = this.snake.foodCollision(food);
@@ -332,7 +339,14 @@ class Game {
         }
       });
 
-      if (this.snake.leftArena() || this.snake.selfCollision()) {
+      const hitWall = this.snake.leftArena();
+      const hitSelf = this.snake.selfCollision();
+
+      if (
+        (hitWall &&
+          !this.saveState.progress.upgrades.includes("portal-walls")) ||
+        hitSelf
+      ) {
         this.stop();
         return;
       }
@@ -609,7 +623,7 @@ class Snake {
     this.direction = newDirection;
   }
 
-  move() {
+  move(portalWalls) {
     const head = this.body[0];
     const newHead = { column: head.column, row: head.row };
 
@@ -642,19 +656,35 @@ class Snake {
 
     /* Move in direction */
     if (this.direction === "right") {
-      newHead.column += 1;
+      if (portalWalls && newHead.column >= COLUMN_COUNT - 1) {
+        newHead.column = 0;
+      } else {
+        newHead.column += 1;
+      }
+
       newHead.connectionLeft = true;
       this.body[0].connectionRight = true;
     } else if (this.direction === "up") {
+      if (portalWalls && newHead.row <= 0) {
+        newHead.row = ROW_COUNT;
+      }
       newHead.row -= 1;
       newHead.connectionBottom = true;
       this.body[0].connectionTop = true;
     } else if (this.direction === "down") {
+      if (portalWalls && newHead.row >= ROW_COUNT - 1) {
+        newHead.row = -1;
+      }
       newHead.row += 1;
       newHead.connectionTop = true;
       this.body[0].connectionBottom = true;
     } else if (this.direction === "left") {
-      newHead.column -= 1;
+      if (portalWalls && newHead.column <= 0) {
+        newHead.column = COLUMN_COUNT - 1;
+      } else {
+        newHead.column -= 1;
+      }
+
       newHead.connectionRight = true;
       this.body[0].connectionLeft = true;
     }
@@ -672,20 +702,26 @@ class Snake {
     const secondLastSegment = this.body[this.body.length - 2];
 
     lastSegment.connectionTop =
-      lastSegment.row > secondLastSegment.row &&
-      lastSegment.column === secondLastSegment.column;
+      lastSegment.column === secondLastSegment.column &&
+      (lastSegment.row - 1 === secondLastSegment.row ||
+        (lastSegment.row === 0 && secondLastSegment.row === ROW_COUNT - 1));
 
     lastSegment.connectionRight =
       lastSegment.row === secondLastSegment.row &&
-      lastSegment.column < secondLastSegment.column;
+      (lastSegment.column + 1 === secondLastSegment.column ||
+        lastSegment.column - COLUMN_COUNT + 1 === secondLastSegment.column);
 
     lastSegment.connectionBottom =
-      lastSegment.row < secondLastSegment.row &&
-      lastSegment.column === secondLastSegment.column;
+      lastSegment.column === secondLastSegment.column &&
+      (lastSegment.row + 1 === secondLastSegment.row ||
+        lastSegment.row - ROW_COUNT + 1 === secondLastSegment.row);
 
     lastSegment.connectionLeft =
       lastSegment.row === secondLastSegment.row &&
-      lastSegment.column > secondLastSegment.column;
+      (lastSegment.column === secondLastSegment.column + 1 ||
+        lastSegment.column - COLUMN_COUNT - 1 === secondLastSegment.column ||
+        (lastSegment.column === 0 &&
+          secondLastSegment.column === COLUMN_COUNT - 1));
   }
 
   leftArena() {
